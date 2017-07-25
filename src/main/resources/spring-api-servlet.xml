@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd"
+	default-lazy-init="true">
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="com.zjht.manager.common.web.springmvc.BindingInitializer"/>
+		</property>
+	    <property name="messageConverters">  
+	        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+	        <property name="supportedMediaTypes">  
+	            <list>  
+	                <value>text/plain;charset=utf-8</value>  
+	                <value>text/html;charset=utf-8</value>  
+	                <value>text/json;charset=utf-8</value>  
+	                <value>application/json;charset=utf-8</value>  
+	            </list> </property>  
+	        </bean>  
+	    </property>		
+	</bean>
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+	</bean>
+	<bean id="freemarkerViewResolver" class="com.zjht.manager.common.web.springmvc.SimpleFreeMarkerViewResolver">
+		<property name="contentType" value="text/html; charset=UTF-8"/>
+		<property name="exposeRequestAttributes" value="false"/>
+		<property name="exposeSessionAttributes" value="false"/>
+		<property name="exposeSpringMacroHelpers" value="true"/>
+	</bean>
+	<!--统一异常处理器  -->
+    <bean id="exceptionHandler" class="com.zjht.manager.exception.CommonApiExceptionHandler"/>
+    
+	<context:annotation-config/>
+	<!-- Controller声明 -->
+	<!-- 一定要配置了组件扫描后，注解才会生效 -->
+	<context:component-scan base-package="com.zjht.manager.api.service"></context:component-scan>
+</beans>

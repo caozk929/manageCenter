@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<substitutionProperty name="logbase" value="${catalina.base}/logs/" />
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%threadNum] %-5level %logger{60} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Encoding>UTF-8</Encoding>
+		<File>${logbase}mshop.log</File>
+		<maxFileSize>1MB</maxFileSize>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${logbase}mshop.%d{yyyy-MM-dd}.log</FileNamePattern>
+		</rollingPolicy>
+		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+			<pattern>%date [%threadNum] %-5level %logger{60} - %msg%n</pattern>
+		</layout>
+	</appender>
+	<!-- 异常日志文件 -->
+	<appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Encoding>UTF-8</Encoding>
+		<File>${logbase}exception.log</File>
+		<maxFileSize>50MB</maxFileSize>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${logbase}exception.%d{yyyy-MM-dd}.log</FileNamePattern>
+		</rollingPolicy>
+		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+			<pattern>%date [%threadNum] %-5level %logger{60} - %msg%n</pattern>
+		</layout>
+	</appender>
+	<logger name="com.zjht.manager">
+		<level value="INFO" />
+	</logger>		
+	<logger name="com.zjht.manager.exception">
+		<level value="INFO" />
+		<appender-ref ref="EXCEPTION_FILE" />
+	</logger>
+	<logger name="org.springframework">
+		<level value="INFO" />
+	</logger>
+	<root>
+		<level value="ERROR" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
+
