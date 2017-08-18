@@ -90,26 +90,7 @@ public class URLFilter implements Filter {
                 httpServletResponse.sendRedirect(gotoUrl);
                 return;
             }
-        }
-		if(url.contains("webapp/brushRed/verify.do")){
-			HttpServletResponseWrapper wrappedResponse = new HttpServletResponseWrapper(httpServletResponse) {
-	            @Override
-	           public String encodeRedirectUrl(String url) {
-	               return url;
-	            }
-	           public String encodeRedirectURL(String url) {
-	               return url;
-	            }
-	           public String encodeUrl(String url) {
-	               return url;
-	            }
-	           public String encodeURL(String url) {
-	               return url;
-	            }
-	        };
-			//处理
-			chain.doFilter(request, wrappedResponse);
-		}else{
+        }else{
 			// 不处理
 			chain.doFilter(request, response);
 		}
