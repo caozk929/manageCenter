@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -30,8 +31,7 @@ public final class MessageResolver {
 	 */
 	public static String getMessage(HttpServletRequest request, String code,
 			Object... args) {
-		WebApplicationContext messageSource = RequestContextUtils
-				.getWebApplicationContext(request);
+		WebApplicationContext messageSource = ContextLoader.getCurrentWebApplicationContext();
 		if (messageSource == null) {
 			throw new IllegalStateException("WebApplicationContext not found!");
 		}
