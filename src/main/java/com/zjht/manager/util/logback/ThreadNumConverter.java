@@ -15,7 +15,8 @@ public class ThreadNumConverter extends ClassicConverter {
 	@Override
 	public String convert(ILoggingEvent event) {
 		if(local.get()==null){
-			local.set(DateTimeUtils.getRandomCode(8));
+			String threadId = String.valueOf(System.currentTimeMillis()).substring(4);
+			local.set(threadId);
 		}
 		return local.get();
 	}
