@@ -17,7 +17,7 @@ public class IndexAct {
 	@Autowired
 	private RedisTemplate<Serializable, Object> redisTemplate;  
 	
-	@RequestMapping(value="/admin/index.html")
+	@RequestMapping(value="/index/index.html")
 	public String index(HttpServletRequest request, HttpServletResponse response,ModelMap model){
 
 		ValueOperations operations= redisTemplate.opsForValue();
@@ -27,6 +27,7 @@ public class IndexAct {
 		operations.set("userId" + u.getId(),u);
 		final String s = String.valueOf(2);
 
-		return "";
+		Object o = operations.get("userId" + u.getId());
+		return "index";
 	}
 }
