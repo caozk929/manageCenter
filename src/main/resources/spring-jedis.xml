@@ -28,14 +28,26 @@
                     <constructor-arg name="host" value="${cluster1.host.ip}"></constructor-arg>
                     <constructor-arg name="port" value="${cluster1.host.port}"></constructor-arg>
                 </bean>
-<!--                 <bean class="org.springframework.data.redis.connection.RedisNode"> -->
-<!--                     <constructor-arg name="host" value="127.0.0.1"></constructor-arg> -->
-<!--                     <constructor-arg name="port" value="7004"></constructor-arg> -->
-<!--                 </bean> -->
-<!--                 <bean class="org.springframework.data.redis.connection.RedisNode"> -->
-<!--                     <constructor-arg name="host" value="127.0.0.1"></constructor-arg> -->
-<!--                     <constructor-arg name="port" value="7005"></constructor-arg> -->
-<!--                 </bean> -->
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="${cluster2.host.ip}"></constructor-arg>
+					<constructor-arg name="port" value="${cluster2.host.port}"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="${cluster3.host.ip}"></constructor-arg>
+					<constructor-arg name="port" value="${cluster3.host.port}"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="${cluster4.host.ip}"></constructor-arg>
+					<constructor-arg name="port" value="${cluster4.host.port}"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="${cluster5.host.ip}"></constructor-arg>
+					<constructor-arg name="port" value="${cluster5.host.port}"></constructor-arg>
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="${cluster6.host.ip}"></constructor-arg>
+					<constructor-arg name="port" value="${cluster6.host.port}"></constructor-arg>
+				</bean>
             </set>
         </property>
     </bean> 

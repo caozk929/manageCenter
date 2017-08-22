@@ -68,7 +68,7 @@
 				<prop key="time_format">HH:mm:ss</prop>
 				<prop key="number_format">0.######</prop>
 				<prop key="whitespace_stripping">true</prop>
-				<prop key="auto_import">/ftl/pony/index.ftl as p,/ftl/spring.ftl as s</prop>
+				<!--<prop key="auto_import">/ftl/pony/index.ftl as p,/ftl/spring.ftl as s</prop>-->
 			</props>
 		</property>
 	</bean>
