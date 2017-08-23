@@ -5,7 +5,9 @@ import java.util.List;
 import com.zjht.manager.entity.Role;
 import com.zjht.manager.entity.RoleMenu;
 import com.zjht.manager.entity.SysMenu;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface RoleMenuDao {
 
     /**
@@ -29,12 +31,12 @@ public interface RoleMenuDao {
      * @param id
      * @return
      */
-    public List<RoleMenu> findByRoleId(Long roleId);
+    public List<RoleMenu> findByRoleId(Long id);
 
     /**
      * 通过roles查找
      * 
-     * @param id
+     * @param roles
      * @return
      */
     public List<SysMenu> findByRoles(List<Role> roles);

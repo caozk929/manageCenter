@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.UserDao">
+
+   <resultMap id="BaseResultMap" type="com.zjht.manager.entity.User">
+
+   </resultMap>
+  
+   <sql id="Base_Column_List"> 
+		id,mobile
+   </sql>
+  
+   <insert id="insert" parameterType="com.zjht.manager.entity.User">
+	 <selectKey resultType="String"  order="BEFORE" keyProperty="userId" >
+		 select  lpad(nextval('SEQ_USERS'),11,'0') as id
+	 </selectKey>
+	 insert into User (id,mobile) values(#{id},#{mobile)
+   </insert>
+   
+   <update id="update" parameterType="com.zjht.manager.entity.User">
+
+   </update>
+   
+   <delete id="delete" parameterType="java.lang.String">
+   		update user set isdelete='1' where userId=#{userId,jdbcType=VARCHAR}
+   </delete>
+	<select id="getUserById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		from user where id=#{userId}
+	</select>
+
+</mapper>

@@ -1,0 +1,71 @@
+﻿.tree {
+    min-height:20px;
+    background-color:#fbfbfb;
+    border:1px solid #999;
+}
+.tree li {
+    list-style-type:none;
+    margin:0;
+    padding:5px 5px 0 10px;
+    position:relative
+}
+.tree li span {
+    white-space:nowrap;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    border:1px solid #999;
+    border-radius:5px;
+    display:inline-block;
+    padding:3px 8px;
+    text-decoration:none;
+    vertical-align: middle;
+}
+.tree li.parent_li>span {
+    cursor:pointer
+}
+.tree>ul>li::before, .tree>ul>li::after {
+    border:0
+}
+.tree li:last-child::before {
+    height:30px
+}
+.tree li.parent_li>span:hover, .tree li.parent_li>span:hover+ul li span {
+    background:#eee;
+    border:1px solid #94a0b4;
+    color:#000
+}
+[class^="icon-"], [class*=" icon-"] {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+    line-height: 14px;
+    vertical-align:middle;
+    background-image: url("./images/glyphicons-halflings.png");
+    background-position: 14px 14px;
+    background-repeat: no-repeat;
+}
+.icon-folder-open {
+    width: 16px;
+    background-position: -408px -120px;
+}
+
+.icon-plus-sign {
+    background-position: 0 -96px;
+}
+.icon-minus-sign {
+    background-position: -24px -96px;
+}
+.icon-leaf {
+    background-position: -48px -120px;
+}
+.tree ul li ul {padding-left: 0px; margin-left: 15px; border-left: 1px solid #ddd;}
+
+.treecon { position: absolute; left: 20px;top: 0;bottom: 0; width: 300px; top: 126px;}
+.treecon .tree { position: absolute; top: 0px; left: 0; bottom: 10px; right: 0;}
+.treecon .searchpanel { padding: 10px;}
+.treecon .searchpanel .keyword  { width: 146px;}
+.treecon .roottree { position: absolute;top: 0px;right: 0;left: 0px;bottom: 10px; overflow: auto;}
+.tree .addsubitem { display: inline-block; height: 16px; width: 16px; margin: 0px 4px; background: url(../images/add.png) no-repeat;vertical-align: middle; }
+.tree .deleteitem { display: inline-block; height: 16px; width: 16px; background: url(../images/delete.png) no-repeat;vertical-align: middle; }
+.dicteditcon { position: absolute; top: 126px; left: 340px; bottom: 0; right: 10px; overflow-y: auto; overflow-x: hidden;}

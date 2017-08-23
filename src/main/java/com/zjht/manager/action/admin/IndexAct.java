@@ -1,6 +1,7 @@
 package com.zjht.manager.action.admin;
 
 import com.zjht.manager.entity.User;
+import com.zjht.manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -16,7 +17,9 @@ import java.io.Serializable;
 public class IndexAct {
 	@Autowired
 	private RedisTemplate<Serializable, Object> redisTemplate;  
-	
+	@Autowired
+	UserService userService;
+
 	@RequestMapping(value="/index/index.html")
 	public String index(HttpServletRequest request, HttpServletResponse response,ModelMap model){
 
@@ -28,6 +31,13 @@ public class IndexAct {
 		final String s = String.valueOf(2);
 
 		Object o = operations.get("userId" + u.getId());
-		return "index";
+		return "index/index";
+	}
+
+	@RequestMapping(value="/index/login.html")
+	public String login(HttpServletRequest request, HttpServletResponse response,ModelMap model){
+		User user = userService.getUserById(1L);
+		System.out.println(user);
+		return "index/login";
 	}
 }
