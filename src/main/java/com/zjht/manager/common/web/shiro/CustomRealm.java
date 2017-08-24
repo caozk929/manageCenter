@@ -28,12 +28,12 @@ public class CustomRealm extends AuthorizingRealm{
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String username = (String)token.getPrincipal();
-        User user = new User();
-        if(user == null) {
-            //没找到帐号
+        if (username != null && !"".equals(username)) {
+            User user = userService.getUserByUserName(username);
+            if (user != null) {
+                return new SimpleAuthenticationInfo(user.getUserName(), user.getUserPwd(), getName());
+            }
         }
-        //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以在此判断或自定义实现
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo();
-        return authenticationInfo;
+        return null;
     }
 }

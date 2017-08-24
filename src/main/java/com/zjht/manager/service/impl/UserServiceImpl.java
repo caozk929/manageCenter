@@ -24,4 +24,9 @@ public class UserServiceImpl implements UserService {
     public List<User> getUserList(Map<String,Object> params, int pageIndex, int pageSize) {
         return userDao.getUsersList(params, "t.*", "regdate desc", pageIndex, pageSize);
     }
+
+    @Override
+    public User getUserByUserName(String userName) {
+        return userDao.getUserByUserName(userName);
+    }
 }

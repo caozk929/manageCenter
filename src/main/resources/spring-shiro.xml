@@ -32,7 +32,7 @@
 
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
-		<property name="loginUrl" value="/user/user/login.html" />
+		<property name="loginUrl" value="/admin/index/login.html" />
 		<!-- <property name="successUrl" value="/login/loginSuccessFull" /> -->
 		<property name="unauthorizedUrl" value="/error/403.jsp" />
 		<!-- <property name="filters">

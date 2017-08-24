@@ -20,4 +20,5 @@ public interface UserDao {
             @Param(value = "pageIndex")  int pageIndex,
             @Param(value = "pageSize") int pageSize
     );
+    User getUserByUserName(String userName);
 }

@@ -11,4 +11,6 @@ public interface UserService {
     User getUserById(Long id);
 
     List<User> getUserList(Map<String,Object> params, int pageIndex, int pageSize);
+
+    User getUserByUserName(String userName);
 }
