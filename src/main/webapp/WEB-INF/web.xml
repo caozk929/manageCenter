@@ -17,15 +17,10 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	<servlet>
-		<servlet-name>FrontDispatcher</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:spring-front-servlet.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminDispatcher</servlet-name>
+		<url-pattern>/admin/*</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>ApiDispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -35,14 +30,6 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>AdminDispatcher</servlet-name>
-		<url-pattern>/admin/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>FrontDispatcher</servlet-name>
-		<url-pattern>/front/*</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ApiDispatcher</servlet-name>
 		<url-pattern>/api/*</url-pattern>
@@ -71,10 +58,10 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	<session-config>
 		<session-timeout>60</session-timeout>
