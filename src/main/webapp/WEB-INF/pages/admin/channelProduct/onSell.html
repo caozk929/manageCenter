@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script> 	
+    layui.use(['form', 'layer', 'laydate'], function() {
+        var form = layui.form, layer = layui.layer, laydate = layui.laydate;
+        laydate.render({
+            elem: '#gmtOnSell', //指定元素
+            type: 'datetime', //日期格式类型
+        });
+        laydate.render({
+            elem: '#gmtOffSell', //指定元素
+            type: 'datetime', //日期格式类型
+        });	        
+        //监听提交
+        form.on('submit(save)', function(data) {
+        	var gmtOnSell = $('#gmtOnSell').val();
+        	var gmtOffSell = $('#gmtOffSell').val();
+        	if(gmtOnSell != '' && gmtOffSell != '') {
+        		if(gmtOffSell <= gmtOnSell) {
+        			layer.msg('下架时间不能小于上架时间', {icon: 5});
+        			return false;
+        		}
+        	}        	
+            var url = "${path}/admin/channelProduct/alive.do?bizCode=${bizCode}05";
+            $.post(url, $("#mainForm").serialize(), function(data){
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	parent.location.reload();
+                        return true;
+                    }, 1000);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+    });
+</script>
+<title>商品上架</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="mainForm" action="">		
+			<input type="hidden" name="id" value="${channelProduct.id!''}">
+	        <div class="layui-form-item">
+	            <label class="layui-form-label">上架时间</label>
+	            <div class="layui-input-block">
+	            <#if channelProduct.gmtOnSell??>
+	                <input id="gmtOnSell" type="text" name="onSell" value="${channelProduct.gmtOnSell?string('yyyy-MM-dd HH:mm:ss') }" autocomplete="off" class="layui-input">
+                <#else>
+                    <input id="gmtOnSell" type="text" name="onSell" value="${.now?date?string('yyyy-MM-dd HH:mm:ss') }" autocomplete="off" class="layui-input">
+                </#if>	            
+	            </div>
+	        </div>
+	        <div class="layui-form-item">
+	            <label class="layui-form-label">下架时间</label>
+	            <div class="layui-input-block">
+	            <#if channelProduct.gmtOffSell??>
+	                <input id="gmtOffSell" type="text" name="offSell" value="${channelProduct.gmtOffSell?string('yyyy-MM-dd HH:mm:ss') }" autocomplete="off" class="layui-input">
+                <#else>
+                    <input id="gmtOffSell" type="text" name="offSell" placeholder="请输入下架时间" autocomplete="off" class="layui-input">
+                </#if>	            
+	            </div>
+	        </div>					
+
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+				</div>
+			</div>		
+		</form>
+	</div>
+</body>
+</html>

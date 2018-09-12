@@ -1,0 +1,31 @@
+@charset "utf-8";
+
+/*初始化样式*/
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,select,button,textarea,p,blockquote,th,td{ font-family:Microsoft YaHei,Helvitica,Verdana,Arial,san-serif; font-size:13px; margin:0; padding:0;}
+ul,ol,li{ list-style:none;}
+table { border-collapse:collapse; border-spacing:0;} 
+th,td { padding:0;}
+i,em{ font-style:normal;}
+a:link,a:visited{ color:#333; text-decoration:none; outline:none;}
+a:hover{ color:#000; text-decoration:none;}
+a:active {star:expression(this.onFocus=this.blur());} 
+img{ border:0 none; display:block;}
+h1,h2,h3,h4,h5,h6{ font-weight:normal;}
+svg>text{ display:none;}
+
+/*清除IE浏览器input后面的小图标*/
+input::-ms-clear{ display:none}
+input::-ms-reveal{ display:none;}
+/*去掉input点击后出现的边框*/
+input{ outline:none;}
+textarea{ outline:none; resize:none;}
+
+/*清除浮动*/
+.clearfloat:after{ content:''; display:block; overflow:hidden; visibility:hidden; font-size:0; line-height:0; width:0; height:0;}
+.clearfloat{zoom:1;}
+.fl{ float:left;}
+.fr{ float:right;}
+.fno{ width:100%; content:''; display:table;}
+
+html,body{ color:#333;}
+.w1200{ width:1200px; margin:0 auto;}

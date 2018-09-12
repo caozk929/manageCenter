@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+function add(layer) {
+    
+    var url = "${path}/admin/channelProduct/strategy/addParam.do?bizCode=${bizCode}06";
+    //异步请求返回页面
+    $.post(url, {strategyId: '${channelStrategy.id!''}'}, function (data) {
+        layer.open({
+            type: 1 //返回html类型
+            , title: '策略 参数'
+            , area: ['500px', '300px']//窗口大小
+            , shade: 0.3//显示透明罩效果
+            , maxmin: true
+            , btnAlign: 'c'//按钮位置居中
+            , content: data
+            , zIndex: 999 //重点1：层级    
+            , success: function (layero, index) {//参数1：当前dom,参数2：索引
+            	//不reset单选框不出现
+            	$("#resetParam").click();
+            }
+        });
+    }, "HTML");    
+}
+
+function update(layer, pid) {    
+    var url = "${path}/admin/channelProduct/strategy/updateParam.do?bizCode=${bizCode}08";
+    //异步请求返回页面
+    $.post(url, {id: pid}, function (data) {
+        layer.open({
+            type: 1 //返回html类型
+            , title: '策略 参数'
+            , area: ['500px', '300px']//窗口大小
+            , shade: 0.3//显示透明罩效果
+            , maxmin: true
+            , btnAlign: 'c'//按钮位置居中
+            , content: data
+            , zIndex: 999 //重点1：层级    
+            , success: function (layero, index) {//参数1：当前dom,参数2：索引
+            	//不reset单选框不出现
+            	$("#resetParam").click();
+            }
+        });
+    }, "HTML");    
+}
+
+function save(layer, info) {
+    $.ajax({
+        url: "${path}/admin/channelProduct/strategy/saveParameter.do?bizCode=${bizCode}06",
+        type: "POST",
+        data: info,
+        dataType: "JSON",
+        success: function (data) {
+            if (data.status == "00000") {
+                layer.msg(data.msg);
+                setTimeout(function () {
+                	location.reload(); 
+                }, 500);
+            } else {
+                layer.msg(data.msg);
+            }
+        }
+    });
+}
+
+function del(layer, id) {
+    //确认框
+    layer.open({//配置样式
+        type: 0,//信息框
+        title: '温馨提示：',
+        content: '确定删除策略参数吗？',
+        shahe: 0.3,//遮罩效果
+        time: 5000,//5秒没有点击自动关闭
+        btn: ['确定', '取消'],
+        yes: function () {//确定
+            //异步删除
+            $.ajax({
+                url: "${path}/admin/channelProduct/strategy/delParameter.do?bizCode=${bizCode}07",
+                type: "POST",
+                data: {"id": id},
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.status == "00000") {
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        },
+        btn2: function () {//取消
+            layer.closeAll();
+        }
+    });
+}
+
+
+    layui.use(['form', 'layer', 'table'], function() {
+        var form = layui.form, layer = layui.layer, table = layui.table;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            var url = "${path}/admin/channelProduct/strategy/save.do?bizCode=${bizCode}02";
+            $.post(url, $("#mainForm").serialize(), function(data){
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	parent.location.href="${path}/admin/channelProduct/strategy/list.do?bizCode=${bizCode}";
+                        return true;
+                    }, 1000);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+        
+		  table.init('tblMain', {
+			  page:true, 
+			  even: true,
+			  id:'idMain',
+		            url: '/admin/channelProduct/strategy/listParameter.json',
+		            method:'POST',
+		            where : {bizCode:'${bizCode}05', strategyId:'${channelStrategy.id!''}'},
+		            limits: [1,10,20,30,50,100],
+		            limit: 10,
+		            request: {
+		                pageName: 'pageNum', //页码的参数名称，默认：page
+		                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+		            },
+		            response: {
+		            	statusName: 'status',
+		            	statusCode: '00000', //成功的状态码，默认：0
+		                msgName: 'msg', //状态信息的字段名称，默认：msg
+		                countName: 'count', //数据总数的字段名称，默认：count
+		                dataName: 'data'
+		            }			  
+		  });  
+		  //监听表格复选框选择
+		  table.on('checkbox(tblMain)', function(obj){
+		    console.log(obj)
+		  });
+		  //监听工具条
+		  table.on('tool(tblMain)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'del'){
+		        del(layer, data.id)
+		    } else if(obj.event === 'update'){
+			  	update(layer, data.id);
+			} 
+		  });
+		  //监听单元格编辑
+		  table.on('edit(tblMain)', function(obj) {
+		      var value = obj.value, data = obj.data, field = obj.field;		  
+			  data[field] = value; //更新缓存中的值
+		  });		  
+        
+  	  		var $ = layui.$, active = {
+  		    addPara: function () {    
+  		    	var info ='<div class="layui-form-item"><div class="layui-inline"><label class="layui-form-label">多规则验证</label><div class="layui-input-inline"><input type="text" name="number" lay-verify="required|number" autocomplete="off" class="layui-input"></div></div>';
+  		    	//$("#addPara").after(info);
+  		    	add(layer);
+  		    }
+  		  };
+
+  	      $('.layui-btn-small').on('click', function() {   	  
+  	          var $othis = $(this), $method = $othis.data('method');
+  	          active[$method] ? active[$method].call(this, $othis) : '';
+  	      });        
+    });
+</script>
+<title>新增/编辑 渠道策略</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="mainForm" action="">		
+			<input type="hidden" name="id" value="${channelStrategy.id!''}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">策略编码</label>
+				<div class="layui-input-block">
+					<input type="text" name="strategyCode" value="${channelStrategy.strategyCode!''}" required lay-verify="required" placeholder="请输入策略编码" autocomplete="off" class="layui-input">
+				</div>
+			</div>			
+			<div class="layui-form-item">
+				<label class="layui-form-label">策略名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="strategyName" value="${channelStrategy.strategyName!''}" required lay-verify="required" placeholder="请输入策略名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">策略说明</label>
+				<div class="layui-input-block">
+					<input type="text" name="strategySummary" value="${channelStrategy.strategySummary!''}" placeholder="请输入策略说明" autocomplete="off" class="layui-input">
+				</div>
+			</div>	
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="save">提交基本信息</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+				</div>
+			</div>			
+		</form>			
+			
+			<div class="layui-form-item" id="addPara">
+				<div>
+					<a class="layui-btn layui-btn-small" data-method="addPara">添加策略参数</a>
+				</div>
+			</div>	
+			
+	<div style="margin: 20px;">
+		<table class="layui-table" lay-filter="tblMain">
+		  <thead>
+		    <tr>
+		      <th lay-data="{field:'parameterName', width:160}">名称</th>
+		      <th lay-data="{field:'parameterCode', width:160}">编码</th>
+		      <th lay-data="{field:'parameterTypeStr', width:160}">类型</th>
+		      <th lay-data="{fixed: 'right', width:125, align:'center', toolbar: '#barMain'}">操作</th>
+		    </tr>
+		  </thead>
+		</table>		 
+		<script type="text/html" id="barMain">
+			<a class="layui-btn layui-btn-mini" lay-event="update">修改</a>
+			<a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+		</script>	
+	</div> 							
+
+	</div>
+</body>
+</html>

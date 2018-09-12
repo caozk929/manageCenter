@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>中经汇通统一商城接口文档t</title>
+	<link rel="stylesheet" type="text/css" href="/resource/css/api/base.css">
+	<link rel="stylesheet" type="text/css" href="/resource/css/api/doc.css">
+</head>
+<body>
+	<!-- S 头部 -->
+	<div class="header">
+		<div class="header-in">
+			<div class="header-title">
+				<h1 class="title">中经汇通 | 统一商城接口说明文档</h1>
+			</div>
+		</div>
+	</div>
+	<!-- E 头部 -->
+	<!-- S 导航 -->
+	<div class="nav">
+		<dl>
+			<dt><a href="#wdsm">1.文档说明</a></dt>
+			<dd><a href="#gnms">1.1功能描述</a></dd>
+			<dd><a href="#yddx">1.2阅读对象</a></dd>
+			<dd><a href="#sy">1.3术语</a></dd>
+		</dl>
+		<dl>
+			<dt><a href="#txxy">2.通讯协议</a></dt>
+			<dd><a href="#txgc">2.1通讯过程(同步返回数据)</a></dd>
+		</dl>
+		<dl>
+			<dt><a href="#jkqqxygf">3.接口请求响应规范</a></dt>
+			<dd><a href="#qqtycs">3.1请求通用参数</a></dd>
+			<dd><a href="#qqywcs">3.2请求业务参数</a></dd>
+			<dd><a href="#fhtycs">3.3返回通用参数</a></dd>
+			<dd><a href="#fhywcljg">3.4返回业务处理结果</a></dd>
+		</dl>
+		<dl>
+			<dt><a href="#jkaqgf">4.接口安全规范</a></dt>
+			<dd><a href="#qmjm">4.1签名加密</a></dd>
+			<dd><a href="#csscyl">4.2sign参数生成样例</a></dd>
+		</dl>
+		<dl>
+			<dt><a href="#jkdy">5.接口定义</a></dt>
+			<dd><a href="#splm">5.1获取商品类目</a></dd>
+			<dd><a href="#splb">5.2获取商品列表</a></dd>
+			<dd><a href="#spxq">5.3获取商品详情</a></dd>
+			<dd><a href="#qdzfpz">5.4获取渠道支付配置</a></dd>
+			<dd><a href="#qdggtp">5.5获取渠道广告图片</a></dd>
+			<dd><a href="#qdspkc">5.6更新渠道商品库存</a></dd>
+		</dl>
+		<dl>
+			<dt><a href="#fhmdz">6.返回码对照</a></dt>
+		</dl>
+	</div>
+	<!-- E 导航 -->
+	<!-- S 主体部分 -->
+	<div class="content">
+		<h2><a name="wdsm">1.文档说明</a></h2>
+		<h3><a name="gnms">1.1功能描述</a></h3>
+		<p>本接口文档描述了中经汇通统一配置管理中心与客户端程序交互接口。</p>
+		<h3><a name="yddx">1.2阅读对象</a></h3>
+		<p>本文档主要是面向接入统一配置管理中心的工程师及相关人员。</p>
+		<h3><a name="sy">1.3术语</a></h3>
+		<div class="terms">
+			<table>
+				<thead>
+					<tr>
+						<th>名词</th>
+						<th>解释</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>渠道</td>
+						<td>各个接入统一配置管理中心的系统，例如H5商城、油马app、有油网对配置管理中心来说都是不同的渠道。</td>
+					</tr>
+					<tr>
+						<td>渠道商品</td>
+						<td>在各个渠道售卖的产品。</td>
+					</tr>
+					<tr>
+						<td>渠道编码</td>
+						<td>各个渠道系统在本系统的唯一编号</td>
+					</tr>
+					<tr>
+						<td>接口编码</td>
+						<td>本系统对各接口服务进行统一的编码处理，例如商品列表为i010101</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2><a name="txxy">2.通讯协议</a></h2>
+		<p>统一采用HTTP+JSON传递数据，报文编码统一采用UTF-8。对于获取数据使用POST方式请求，更新数据使用PUT方式请求。</p>
+		<h3><a name="txgc">2.1通讯过程(同步返回数据)</a></h3>
+		<p>第三方系统请求统一配置管理中心接口，本系统接手请求后，对请求的合法性以及参数进行校验，校验通过后将处理结果封装为JSON格式数据同步返回。</p>
+
+		<h2><a name="jkqqxygf">3.接口请求响应规范</a></h2>
+		<p>各渠道调用本系统接口请求参数分为两部分，一部分为通用参数，一部分为对应接口业务参数。接口返回同样分为两部分，一部分是通用参数，一部分为接口业务处理结果。</p>
+		<h3><a name="qqtycs">3.1请求通用参数</a></h3>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>请求时间</td>
+						<td>requestTime</td>
+						<td>是</td>
+						<td>long</td>
+						<td>13</td>
+						<td>需要参与签名，调用端获取当前的时间戳</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>接口业务编码</td>
+						<td>bizCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td>7</td>
+						<td>需要参与签名，接口在本系统的业务编码</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>渠道编码</td>
+						<td>channelCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td>7</td>
+						<td>需要参与签名，渠道在本系统对应的编码</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>渠道系统流水号</td>
+						<td>flowNo</td>
+						<td>是</td>
+						<td>string</td>
+						<td>18</td>
+						<td>需要参与签名，渠道每次请求生成一个流水号</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>随机数字串</td>
+						<td>random</td>
+						<td>是</td>
+						<td>string</td>
+						<td>4</td>
+						<td>需要参与签名，调用端生成随机数字串</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>版本号</td>
+						<td>version</td>
+						<td>是</td>
+						<td>int</td>
+						<td>2</td>
+						<td>不需要参与签名，必须为整数</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>签名</td>
+						<td>sign</td>
+						<td>是</td>
+						<td>string</td>
+						<td>40</td>
+						<td>请求参数通过加密算法加密后生成的签名串，详见“接口安全规范”</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>请求业务参数</td>
+						<td>request</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>对应接口的业务参数</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h3><a name="qqywcs">3.2请求业务参数</a></h3>
+		<p>各个接口请求的业务参数request由各接口规定，详见各接口定义。</p>
+		<h3><a name="fhtycs">3.3返回通用参数</a></h3>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>响应时间</td>
+						<td>respTime</td>
+						<td>是</td>
+						<td>long</td>
+						<td>13</td>
+						<td>接口响应的当前时间戳</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>响应编码</td>
+						<td>respCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td>7</td>
+						<td>响应编码,00000表示接口响应成功,其他失败，详见“6.返回码对照”</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>渠道系统流水号</td>
+						<td>flowNo</td>
+						<td>是</td>
+						<td>string</td>
+						<td>18</td>
+						<td>渠道调用时给到本系统的流水号</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>随机数字串</td>
+						<td>random</td>
+						<td>是</td>
+						<td>string</td>
+						<td>4</td>
+						<td>渠道调用时给到本系统的随机数字串</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>返回业务参数</td>
+						<td>response</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>各对应接口的业务处理结果</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h3><a name="fhywcljg">3.4返回业务处理结果</a></h3>
+		<p>各个接口的业务处理返回结果reponse由各接口定义。</p>
+
+		<h2><a name="jkaqgf">4.接口安全规范</a></h2>
+		<h3><a name="qmjm">4.1签名加密</a></h3>
+		<div>
+			<p>签名加密过程分为两步，首先需要将需要加密的参数按照规则拼接为一个字符串S1,然后再将S1根据签名加密算法生成字符串sign。</p>
+			<p class="red">重要说明：需要加密的参数由 通用参数部分+业务参数部分组成。</p>
+			<p class="red">通用参数部分为：requestTime、bizCode、channelCode 、flowNo、random</p>
+			<p class="red">业务参数部分为request的json字符串，request中参数按字典顺序排列。</p>
+			<p>参数原始字符串的拼接规则：</p>
+			<p>1.所有需要加密的参数按参数名的ASCII码从小到大自然排序，在根据URL键值对的方式拼接成字符串S1（如：bizCode=c010101&channelCode=c010105&flowNo=201709261258974562&random=4356&requestTime=1506502408993&request=业务参数json字符串&channelAccount=账号&channelKey=秘钥）。请注意最后一定要拼接上账号和秘钥后再执行第二步的签名加密（账号和秘钥不用参与自然排序，一定是拼接在最后）。账号的参数名使用channelAccount，秘钥的参数名使用channelKey。</p>
+			<p>2.对第一步中生成的字符串S1进行用SHA-1加密，然后用密文生成16进制串，得到sign字符串，长度为40位。</p>
+		</div>
+		<h3><a name="csscyl">4.2sign参数生成样例</a></h3>
+		<p>1.S1:bizCode=c010101&channelCode=c010105&flowNo=201709261258974562&random=4356&requestTime=1506502408993&request={"channelproductCode":"c010103_A001"}&channelAccount=appAcc1&channelKey=4e429e7d2137d2d4ebc490d9389ad869</p>
+		<p>2.sign:5d9863719aceeca09e891724d265e08cccf792c5</p>
+		<h2><a name="jkdy">5.接口定义</a></h2>
+		<h3><a name="splm">5.1获取商品类目</a></h3>
+		<h4>request具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<h4>response具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>渠道编码</td>
+						<td>code</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>列表</td>
+						<td>items</td>
+						<td>是</td>
+						<td>数组</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中items具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>类目编码</td>
+						<td>categoryCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>类目名称</td>
+						<td>categoryName</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>是否有子类目</td>
+						<td>children</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>T：有；F：无</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>类目级别</td>
+						<td>level</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>上级类目编码</td>
+						<td>upCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>没有上级目录，该字段为空</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993",
+			"request": {
+			"code": "c010101"
+			    },
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"nonce": "8ea94b9ed3be4b808920d0490e95b3cb",
+			"requestTime": "1506502408993",
+			"response": {
+			"code": "c010101"，
+			"items": [
+				{
+				"categoryCode ": "001",
+				"categoryName ": "生活服务",
+				"children ": "F",
+				"level": "1",
+				" upCode":""
+				},
+				{
+				"categoryCode ": "002",
+				"categoryName ": "加油服务",
+				"children ": "F",
+				"level": "1",
+				" upCode":""
+				}
+				{
+				"categoryCode ": "002_01",
+				"categoryName ": "电子券",
+				"children ": "T",
+				"level": "1",
+				" upCode":"002"
+				}
+
+			]
+			},
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h3><a name="splb">5.2获取商品列表</a></h3>
+		<h4>request具体参数列表：（类目编码、商品名称、渠道标签可三选一，全部不选返回该渠道所有商品）</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>渠道编码</td>
+						<td>code</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>类目编码</td>
+						<td>categoryCode</td>
+						<td>否</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>商品名称</td>
+						<td>productTitle</td>
+						<td>否</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>渠道标签</td>
+						<td>channelTag</td>
+						<td>否</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>每页条数</td>
+						<td>pageNum</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>当前页码</td>
+						<td>curPage</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response具体参数列表：（类目编码、商品名称、渠道标签三选一，与请求参数一致）</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>渠道编码</td>
+						<td>code</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>类目编码</td>
+						<td>categoryCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>商品名称</td>
+						<td>productTitle</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>渠道标签</td>
+						<td>channelTag</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>总数量</td>
+						<td>total</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>每页条数</td>
+						<td>pageNum</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>当前页码</td>
+						<td>curPage</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>列表</td>
+						<td>items</td>
+						<td>是</td>
+						<td>数组</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中items具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>商品名称</td>
+						<td>productTitle</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>价格</td>
+						<td>goodsPrice</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>00.00型字符串；默认取该商品里单品中最低或者是推荐单品的价格</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>logo</td>
+						<td>goodsLogo</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>商品编码</td>
+						<td>productCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993"
+			"request": {
+			"code": "c010101",
+			"productTitle": "油卡",
+			"pageNum": "10",
+			"curPage": "1"
+			    },
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993"
+			"response": {
+			"code": "c010101"，
+			"categoryCode": "101"，
+			"productTitle ": "汇通加油卡"，
+			" total ": "503"，
+			" pageTotal ": "50"，
+			" pageNum ": "10"，
+			" curPage ": "2"，
+			"items": [
+			{
+			"productTitle ": "汇通加油卡"，
+			"goodsPrice ": "5000.00"，
+			"goodsLogo ": "http://xxx"，
+			" channelproductCode": "101_02"
+			},
+			{
+			"productTitle ": "中石化加油卡"，
+			"goodsPrice ": "3000.00"，
+			"goodsLogo ": "http://xxx"，
+			" channelproductCode": "101_01"
+			}
+			        ]
+			},
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h3><a name="spxq">5.3获取商品详情</a></h3>
+		<h4>request具体参数列表</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>商品编码</td>
+						<td>channelproductCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response具体参数列表</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>渠道编码</td>
+						<td>code</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>商品编码</td>
+						<td>channelproductCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>商品名称</td>
+						<td>productTitle</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>商品品牌</td>
+						<td>brand</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>商品型号</td>
+						<td>series</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>计量单位</td>
+						<td>unit</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>商品类目</td>
+						<td>categoryName</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>商品介绍</td>
+						<td>detail</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td>上架时间</td>
+						<td>onSellTime</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>yyyy-mm-dd hh:mm:ss时间型字符串</td>
+					</tr>
+					<tr>
+						<td>10</td>
+						<td>下架时间</td>
+						<td>offSellTime</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>yyyy-mm-dd hh:mm:ss时间型字符串</td>
+					</tr>
+					<tr>
+						<td>11</td>
+						<td>商品属性</td>
+						<td>attributes</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>12</td>
+						<td>商品标签</td>
+						<td>tags</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>13</td>
+						<td>所有单品</td>
+						<td>goods</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中attributes具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>属性代码</td>
+						<td>attributeCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>属性名称</td>
+						<td>attributeName</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>属性值</td>
+						<td>attributeValue</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>属性排序</td>
+						<td>attributeOrder</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中tags具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>标签名称</td>
+						<td>tagName</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中goods具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>单品代码</td>
+						<td>goodsCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>单品数量</td>
+						<td>goodsCount</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>数字型字符串</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>销售价</td>
+						<td>sellPrice</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>00.00型字符串</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>市场价</td>
+						<td>price</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>00.00型字符串</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>单品logo</td>
+						<td>logo</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>单品属性</td>
+						<td>attributes</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td>结构同商品属性</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>单品标签</td>
+						<td>tags</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td>结构同商品属性</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>单品策略</td>
+						<td>strategys</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td>结构同商品属性</td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td>专有编码</td>
+						<td>specificGoodsCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>外部渠道产品编码（对接汇生活或者EPAY系统用）</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中strategys具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>策略代码</td>
+						<td>strategyCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>策略参数</td>
+						<td>strategyParam</td>
+						<td></td>
+						<td>数组</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response中strategyParam具体参数列表</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>参数代码</td>
+						<td>paramCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>参数值</td>
+						<td>paramValue</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993",
+			"request": {
+			"code": "c010101",
+			"channelproductCode": "001_01"
+			    },
+			"requestTime": "1506502408993",
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"nonce": "8ea94b9ed3be4b808920d0490e95b3cb",
+			"requestTime": "1506502408993",
+			"response": {
+			"code": "c010101"，
+			"channelproductCode": "001_01"，
+			"productTitle ": "汇通加油卡"，
+			" brand ": "中经汇通"，
+			" series": "一卡通"，
+			" unit": "张"，
+			" categoryName": "实体卡"，
+			" detail": "中经汇通加油卡……"，
+			"onSellTime": "2017-09-12 00:00:00"，
+			"offSellTime": ""，
+			"goods": [
+			{
+			"goodsCode": "001_01_01"，
+			"goodsCount": "100"，
+			"sellPrice": "80.00"，
+			"price": "100.00",
+			"logo": "http://XXX"，
+			"goodsCount": "100"，
+			"specificGoodsCode": "acd250214"，
+			"attributes": [
+			               {"attributeCode ": "00010"，
+			                "attributeName ": "油种"，
+			                "attributeValue ": "石油"，
+			                " attributeOrder": "1"
+			               }
+			           ],
+			"tags": [
+			          {"tagName": "新品"}
+			       ],
+			"strategys": [
+			               {
+			                 "strategyCode": "redPacket",
+			                 "strategyParam": [
+			                                  {"paramCode": " packetCount","paramValue":"3"},
+			                                  {"paramCode": " packetMax","paramValue":"10"}
+			                                ]
+			               }
+			            ]
+			           }
+			        ]
+			 }
+			]
+			},
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h3><a name="qdzfpz">5.4获取渠道支付配置</a></h3>
+		<h4>request具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>合作商代码</td>
+						<td>partnerCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>平台给第三方系统提供，如果第三方平台需要查询自己渠道的所有支付配置信息，则传递空字符串，如果需要查询指定合作商的支付信息，则传递对应的合作商代码即可。</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>渠道状态</td>
+						<td>status</td>
+						<td>是</td>
+						<td>int</td>
+						<td></td>
+						<td>渠道支付配置状态，（0：返回所有，1：返回状态启用，2：返回状态停用）</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>配置名称</td>
+						<td>name</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>配置代码</td>
+						<td>code</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>版本</td>
+						<td>version</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>返回但不一定有值</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>字符编码</td>
+						<td>charset</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>货币类型</td>
+						<td>currency</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>合作商代码</td>
+						<td>partnerCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>支付账号</td>
+						<td>payAccount</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>私钥密码</td>
+						<td>privateKeyPwd</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td>私钥文件名</td>
+						<td>privateFile</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>10</td>
+						<td>公钥文件名</td>
+						<td>publicFile</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>11</td>
+						<td>签名类型</td>
+						<td>signType</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>12</td>
+						<td>支付网关地址</td>
+						<td>payUrl</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>13</td>
+						<td>前台回调URL</td>
+						<td>returnUrl</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>14</td>
+						<td>后台回调RUL</td>
+						<td>notifyUrl</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>返回但不一定有值</td>
+					</tr>
+					<tr>
+						<td>15</td>
+						<td>扩展字段一</td>
+						<td>extend1</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>返回但不一定有值</td>
+					</tr>
+					<tr>
+						<td>16</td>
+						<td>扩展字段二</td>
+						<td>extend2</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>返回但不一定有值</td>
+					</tr>
+					<tr>
+						<td>17</td>
+						<td>状态</td>
+						<td>status</td>
+						<td>是</td>
+						<td>int</td>
+						<td></td>
+						<td>1:启用，2:停用</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993",
+			"request": {
+			"code": "c010101",
+			"partnerCode": "b010101",
+			"status": 1
+			    },
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"nonce": "8ea94b9ed3be4b808920d0490e95b3cb",
+			"requestTime": "1506502408993",
+			"response": [
+			        {
+			"charset": "UTF-8",
+			"code": "activePay",
+			"currency": "RMB",
+			"extend1": "{'productName':'通用活动'}",
+			"extend2": "",
+			"name": "status",
+			"notifyUrl": "b010101",
+			"partnerCode": "C000038",
+			"payAccount": "iPhone6SHD",
+			"payUrl": "http://100.88.100.100:8081/Paygateway/payment/bocwmpay.do",
+			"privateFile": "C000038.pfx",
+			"privateKeyPwd": "oC0d0qf5",
+			"publicFile": "expresspay_public.crt",
+			"returnUrl": "/webapp/commAct/payReturn.htm",
+			"signType": "SHA256",
+			"status": 1,
+			"version": "2.0"
+			        },
+			        {
+			"charset": "UTF-8",
+			"code": "activePay",
+			"currency": "RMB",
+			"extend1": "{'productName':'通用活动'}",
+			"extend2": "",
+			"name": "status",
+			"notifyUrl": "b010101",
+			"partnerCode": "C000038",
+			"payAccount": "iPhone6SHD",
+			"payUrl": "http://100.88.100.100:8081/Paygateway/payment/bocwmpay.do",
+			"privateFile": "C000038.pfx",
+			"privateKeyPwd": "oC0d0qf5",
+			"publicFile": "expresspay_public.crt",
+			"returnUrl": "/webapp/commAct/payReturn.htm",
+			"signType": "SHA256",
+			"status": 1,
+			"version": "2.0"
+			        }
+			    ],
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h3><a name="qdggtp">5.5获取渠道广告图片</a></h3>
+		<h4>request具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>图片状态</td>
+						<td>status</td>
+						<td>是</td>
+						<td>int</td>
+						<td></td>
+						<td>0：不可用，1：在用，2：已删除3：查询全部</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>广告位置编码</td>
+						<td>place</td>
+						<td>否</td>
+						<td>string</td>
+						<td></td>
+						<td>广告位置编码，如果不传递则查询所有位置广告，如果需要查看对应广告位置编码请联系对接人员。</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>response具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>名称</td>
+						<td>name</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>图片地址</td>
+						<td>src</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>图片路径</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>链接地址</td>
+						<td>linkUrl</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>点击图片访问地址</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>链接提示</td>
+						<td>tip</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>链接打开方式</td>
+						<td>target</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>图片打开方式（_self,_blank）两种类型</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>序号</td>
+						<td>sort</td>
+						<td>是</td>
+						<td>int</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>状态</td>
+						<td>status</td>
+						<td>是</td>
+						<td>int</td>
+						<td></td>
+						<td>0：不可用，1：再用，2：已删除</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993",
+			"request": {
+			"code": "code1",
+			"status": 1
+			    },
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"nonce": "8ea94b9ed3be4b808920d0490e95b3cb",
+			"requestTime": 1506502408993,
+			"response": [
+			        {
+						"linkUrl": "",
+						"name": "微信广告图1",
+						"sort": 1,
+						"src": "http://199.99.99.99:9090/upload/c0103/2017/09/281054491964ad1.jpg",
+						"status": 1,
+						"target": "_blank",
+						"tip": "链接提示"
+			        },
+			        {
+						"linkUrl": "",
+						"name": "微信广告图2",
+						"sort": 2,
+						"src": "http://199.99.99.99:9090/upload/c0103/2017/09/281054491964ad1.jpg",
+						"status": 1,
+						"target": "_blank",
+						"tip": "链接提示"
+			        }
+			    ],
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h3><a name="qdspkc">5.6更新渠道商品库存</a></h3>
+		<h4>request具体参数列表：</h4>
+		<div class="param">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>参数名称</th>
+						<th>参数名称</th>
+						<th>是否必填</th>
+						<th>参数类型</th>
+						<th>长度</th>
+						<th>描述</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>更新后库存数量</td>
+						<td>count</td>
+						<td>是</td>
+						<td>long</td>
+						<td></td>
+						<td>更新成功后库存数量</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>渠道单品编码</td>
+						<td>goodsCode</td>
+						<td>是</td>
+						<td>string</td>
+						<td></td>
+						<td>更新库存的渠道单品编码</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4>接口requestJSON样例</h4>
+		<p>{
+			"bizCode":"c010101",
+			"channelCode":"c010105",
+			"flowNo":"201709261258974562",
+			"random":"4356",
+			"requestTime":"1506502408993",
+			"request": [
+			        {
+			"code": "code1",
+			"number": 50,
+			"goodsCode": "000000000003",
+			"repertory": 2,
+			"type": 2
+			        },
+			        {
+			"code": "code1",
+			"number": 30,
+			"goodsCode": "000000000004",
+			"repertory": 2,
+			"type": 2
+			        }
+			    ],
+			"requestTime": 1506502408993,
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h4>接口responseJSON样例</h4>
+		<p>{
+			"nonce": "8ea94b9ed3be4b808920d0490e95b3cb",
+			"requestTime": 1506502408993,
+			"response": [
+			        {
+			"count": 20,
+			"goodsCode": "000000000003"
+			        },
+			        {
+			"count": 10,
+			"goodsCode": "000000000004"
+			        }
+			    ],
+			"sign": "3f707313ebc6ce84579084418d3a3720"
+			}
+		</p>
+		<h2><a name="fhmdz">6.返回码对照</a></h2>
+		<div class="code">
+			<table>
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>respCode返回码</th>
+						<th>说明</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>00000</td>
+						<td>成功</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>99999</td>
+						<td>服务器处理内部错误</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>10001</td>
+						<td>通用参数丢失</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>10002</td>
+						<td>找不到渠道信息</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>10003</td>
+						<td>签名不正确</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>10004</td>
+						<td>权限不足</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>10005</td>
+						<td>没有该服务</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>20001</td>
+						<td>request参数错误</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- E 主体部分 -->
+	<!-- S 底部 -->
+	<div class="footer">
+		<div class="footer-in">版权所有@中经汇通</div>
+	</div>
+	<!-- E 底部 -->
+</body>
+</html>

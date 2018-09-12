@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>中经汇通统一商城接口调试</title>
+	<link rel="stylesheet" type="text/css" href="/resource/css/api/base.css">
+	<link rel="stylesheet" type="text/css" href="/resource/css/api/index.css">
+	<link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+</head>
+<body>
+	<!-- S 头部 -->
+	<div class="header">
+		<div class="header-in">
+			<div class="header-title">
+				<h1 class="title">中经汇通 | 接口调试</h1>
+			</div>
+		</div>
+	</div>
+	<!-- E 头部 -->
+	<!-- S 主体 -->
+	<div class="main">
+		<a href="doc.do" target="_blank"><h1 class="doc">查看接口说明文档</h1></a>
+		<div class="main-in">
+			<div class="description">本工具主要用于中经汇通H5统一商城检测接口调用时候的参数是否正确以及返回数据json格式</div>
+			<ul>
+				<li class="first">使用说明：</li>
+				<li>1、选择需要调试的接口</li>
+				<li>2、通用参数所有输入框都是比填项</li>
+				<li>3、request框中输入每个接口自己定义的参数和格式</li>
+				<li>4、点击调试按钮就可以调用接口，返回的参数将显示在<span>响应JSON</span>框内</li>
+			</ul>
+			<div class="body">
+				<div class="body-in">
+					<form id="apiForm" class="layui-form" action="">
+						<div class="layui-form-item">
+						    <label class="layui-form-label">调试接口</label>
+						    <div class="layui-input-block">
+						      	<select name="bizCode" lay-verify="required">
+						      		<#if service?? && service?size != 0>
+							      		<#list service as api>
+							      			<option value="${api.serviceCode }">${api.serviceName }</option>
+							      		</#list>
+						      		</#if>
+						      	</select>
+						    </div>
+					  	</div>	
+						<div class="layui-form-item">
+						    <label class="layui-form-label">渠道账号</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="channelAccount" placeholder="请输入渠道账号" autocomplete="off" class="layui-input">
+						    </div>
+					  	</div>
+						<div class="layui-form-item">
+						    <label class="layui-form-label">渠道秘钥</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="channelKey" placeholder="请输入渠道秘钥" autocomplete="off" class="layui-input">
+						    </div>
+					  	</div>
+						<div class="layui-form-item">
+						    <label class="layui-form-label">渠道编码</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="channelCode" placeholder="请输入渠道编码" autocomplete="off" class="layui-input">
+						    </div>
+					  	</div>
+						<div class="layui-form-item">
+						    <label class="layui-form-label">流水号</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="flowNo" placeholder="请输入流水号" autocomplete="off" class="layui-input">
+						    </div>
+					  	</div>
+						<div class="layui-form-item">
+						    <label class="layui-form-label">随机数字串</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="random" placeholder="请输入随机数字串" autocomplete="off" class="layui-input">
+						    </div>
+					  	</div>
+						<div class="layui-form-item">
+						    <label class="layui-form-label">版本号</label>
+						    <div class="layui-input-block">
+						      <input type="text" name="version" placeholder="请输入版本号" autocomplete="off" class="layui-input" value="1">
+						    </div>
+					  	</div>
+					  	<div class="layui-form-item layui-form-text">
+						    <label class="layui-form-label">request</label>
+						    <div class="layui-input-block">
+						      <textarea name="request" rows="10" placeholder="请输入request参数" class="layui-textarea"></textarea>
+						    </div>
+						</div>
+						<!-- 按钮-->
+			            <div class="layui-form-item">
+			                <div style="width: 80%; margin: 0 auto; text-align: center;">
+			                    <a id="save" class="save" href="javascript:save();" >开始调试</a>
+			                </div>
+			            </div>
+						<div class="layui-form-item layui-form-text">
+						    <label class="layui-form-label">响应JSON</label>
+						    <div class="layui-input-block">
+						      	<textarea id="response" rows="15" class="layui-textarea" readonly="readonly"></textarea>
+						    </div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- E 主体 -->
+	<!-- S 底部 -->
+	<div class="footer">
+		<div class="footer-in">版权所有@中经汇通</div>
+	</div>
+	<!-- E 底部 -->
+</body>
+<!-- js方法，分页，搜索时候部分参数需要重新赋值-->
+<script src="/resource/layui/layui.js"></script>
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+	layui.use(['form'], function() {
+		var form = layui.form;
+	});
+	function save() {
+		$.post("/api/service.do", $("#apiForm").serialize(), function (data) {
+			$('#response').text(JSON.stringify(data));
+        }, "JSON");
+	}
+</script>
+</html>

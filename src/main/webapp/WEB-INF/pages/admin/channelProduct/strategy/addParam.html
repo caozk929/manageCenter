@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+	layui.use('form', function(){
+		  var form = layui.form;		  
+	        form.on('submit(saveParam)', function(data) {
+	            var url = "${path}/admin/channelProduct/strategy/saveParameter.do?bizCode=${bizCode}06";
+	            $.post(url, $("#paramForm").serialize(), function(data){
+	                if (data.status == "00000") {//提示成功后重新加载数据
+	                    layer.msg(data.msg);
+	                    setTimeout(function(){
+	                    	location.reload(); 
+	                        return true;
+	                    }, 500);
+	                } else {
+	                    layer.alert(data.msg);
+	                }
+	            }, "JSON");
+	            return false;//出错则不关闭窗口
+	        });		
+	});
+
+</script>
+
+<title>策略参数</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="paramForm" action="">		
+			<input type="hidden" name="strategyId" value="${strategyId!''}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">参数名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="parameterName" required lay-verify="required" placeholder="请输入策略名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>			
+			<div class="layui-form-item">
+				<label class="layui-form-label">参数代码</label>
+				<div class="layui-input-block">
+					<input type="text" name="parameterCode" required lay-verify="required" placeholder="请输入参数代码" autocomplete="off" class="layui-input">
+				</div>
+			</div>			
+			<div class="layui-form-item">
+				<label class="layui-form-label">参数类型</label>
+				<div class="layui-input-block">
+				      <input type="radio" name="parameterType" value="0" title="字符" checked>
+				      <input type="radio" name="parameterType" value="1" title="数字">
+				      <input type="radio" name="parameterType" value="2" title="金额">
+				      <input type="radio" name="parameterType" value="3" title="时间">
+				</div>
+			</div>			
+
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="saveParam">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="resetParam">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

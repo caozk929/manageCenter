@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>渠道支付配置</title>
+    <!--layui 统一样式文件-->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-content div{margin: 0;}
+        .r-btn-area{margin-top: 10px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-search{margin: 10px 20px 0;}
+    </style>
+</head>
+<body>
+    <!-- 搜索区域 -->
+    <div class="layui-collapse r-search">
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title">搜索</h2>
+            <div class="layui-colla-content layui-show">
+                <form id="acpSearchForm" action="/admin/acp/v_list.do?bizCode=${bizCode }" method="post">
+                    <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                        <label class="layui-form-label" style="width: 70px;">配置名称</label>
+                        <div class="layui-input-block" style="margin-left: 100px;">
+                            <#if acp??>
+                                <input type="text" id="configName" name="configName" value="${acp.configName!'' }" placeholder="请输入配置名称" autocomplete="off" class="layui-input">
+                            <#else>
+                                <input type="text" id="configName" name="configName" placeholder="请输入配置名称" autocomplete="off" class="layui-input">
+                            </#if>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                        <label class="layui-form-label" style="width: 70px;">配置代码</label>
+                        <div class="layui-input-block" style="margin-left: 100px;">
+                            <#if acp??>
+                                <input type="text" id="configCode" name="configCode" value="${acp.configCode!'' }" placeholder="请输入配置代码" autocomplete="off" class="layui-input">
+                            <#else>
+                                <input type="text" id="configCode" name="configCode" placeholder="请输入配置代码" autocomplete="off" class="layui-input">
+                            </#if>
+                        </div>
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    渠道:&nbsp;&nbsp;
+                    <div class="layui-inline">
+                        <select name="channelId" class="layui-input" style="width: 220px;" lay-verify="required"
+                                lay-search="">
+                            <option value="">请选择</option>
+                            <#if channelMap?? && channelMap?size gt 0>
+                                <#list channelMap?keys as key>
+                                    <option value="${key}"
+                                    <#if (acp.channelId)?? && (acp.channelId==key)>selected=selected
+                                    </#if>
+                                    >${(channelMap['${key}'])!""}</option>
+                                </#list>
+                            </#if>
+                        </select>
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+                    <button style="margin-top: -3px;" class="layui-btn">搜索</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 按钮区域 -->
+    <div class="r-content r-btn-area">
+        <!-- 按钮区域 -->
+        <blockquote class="site-text layui-elem-quote">
+            <@p.permission bizCode='${bizCode }02'>
+                <button data-id="" data-method="add" class="layui-btn save"><i class="layui-icon">&#xe608;</i> 新增支付配置</button>
+            </@p.permission>
+            <@p.permission bizCode='${bizCode }04'>
+                <button data-id="" data-method="deleteByIds" class="layui-btn delete"><i class="layui-icon">&#xe640;</i> 批量删除</button>
+            </@p.permission>
+        </blockquote>
+    </div>
+    <!-- 内容区域-->
+    <div id="r-content" class="r-content">
+        <!-- 分页容器-->
+        <table id="page" lay-filter="page"></table>
+    </div>
+</body>
+<!--layui 统一样式js-->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/js/common/jquery.cookie.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--数据按钮模板-->
+<script type="text/html" id="barBtns">
+    <@p.permission bizCode='${bizCode }03'>
+        <a class="layui-btn layui-btn-normal layui-btn-mini" lay-event="edit">编辑</a>
+    </@p.permission>
+    <@p.permission bizCode='${bizCode }04'>
+        <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </@p.permission>
+</script>
+<!--方法，数据加载等JS-->
+<script>
+    function getStatusStr(data) {
+        var status = data.status;
+        switch (status) {
+            case 1 : return "启用";
+            case 2 : return "停用";
+        }
+    }
+    layui.use(['element', 'table', 'jquery', 'layer'], function() {
+        var $ = layui.jquery, //使用自带jQuery模块,不需要另外引入jquery文件
+                element = layui.element, //面板需要引入该模块
+                table = layui.table, //内容区域表格渲染需要引入
+                laydate = layui.laydate,
+                layer = layui.layer; //弹出窗体
+
+        //获取勾选中的数据
+        function getCheckData() {
+            var checkStatus = table.checkStatus('table');//根据ID获取表格
+            return checkStatus.data;
+        }
+
+        //获取勾选中的数据数量
+        function getCheckDataLength() {
+            var checkStatus = table.checkStatus('table');//根据ID获取表格
+            return checkStatus.data.length;
+        }
+
+        //监听工具条
+        table.on('tool(page)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {//删除
+                layer.confirm('确定删除该支付配置吗？', function(index) {
+                    //JSON.stringify(data)该方法可以获取到完整的json格式数据，包括没有展示出来的数据
+                    $.ajax({
+                        url: "/admin/acp/deleteById.do?bizCode=${bizCode }04",
+                        type: "POST",
+                        data: {'id': data.id},
+                        dataType: "JSON",
+                        success: function(data) {
+                            layer.msg(data.msg);
+                            if (data.status === '00000') {
+                                layui.table.reload("table");
+                            }
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {//编辑
+                //JSON.stringify(data)该方法可以获取到完整的json格式数据，包括没有展示出来的数据
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2, //返回iframe类型
+                    title: "编辑渠道支付配置", //弹出框标题
+                    area: ['700px', '500px'], //设置宽高
+                    shade: 0.3, //遮罩效果
+                    maxmin: true, //允许最大最小化
+                    btn: [], //按钮
+                    content: "/admin/acp/v_edit.do?bizCode=${bizCode }03&id=" + data.id, //请求URL获取页面
+                    zIndex: 999, //重点1：层级
+                    success: function(layero, index) {//成功后注入事件，不然js在页面完成完成之前就执行，点击没有效果
+                        layer.setTop(layero); //重点2
+                    }
+                });
+            }
+        });
+
+        table.render({ //渲染表格数据
+            id: 'table',//设置ID在获取复选框数据时候需要用到
+            elem: '#page', //数据容器
+            page: true, //开启分页
+            even: true, //开启隔行背景效果
+            limit: 20, //默认每页显示20条
+            limits: layui.globalConfig.limits, //可选每页显示条数
+            cols:[[ //设置表头信息
+                {checkbox: true, width: 140, fixed: true}, //复选框
+                {field: 'channelName', title: '渠道名称', width: 200, fixed: true}, //渠道名称
+                {field: 'configName', title: '配置名称', width: 200, sort: true, fixed: true}, //配置名称
+                {field: 'configCode', title: '配置代码', width: 200, sort: true}, //配置代码
+                {field: 'status', title: '状态', width: 200, sort: true, dataDeal: 'getStatusStr'}, //状态
+                {field: 'partnerCode', title: '合作商代码', width: 200, sort: true}, //合作商代码
+                {field: 'payAccountName', title: '支付账号', width: 200, sort: true}, //支付账号
+                {field: 'publicKeyFileName', title: '公钥文件名', width: 200, sort: true}, //公钥文件名
+                {field: 'privateKeyFileName', title: '私钥文件名', width: 200, sort: true}, //私钥文件名
+                {field: 'privateKeyPwd', title: '私钥密码', width: 300, sort: true}, //私钥密码
+                {field: 'signType', title: '签名类型', width: 150, sort: true}, //签名类型
+                {field: 'payUrl', title: '支付网关地址', width: 400, sort: true}, //支付网关地址
+                {field: 'returnUrl', title: '前台回调URL', width: 400, sort: true}, //前台回调URL
+                {field: 'notifyUrl', title: '后台回调URL', width: 400, sort: true}, //后台回调URL
+                {field: 'currency', title: '货币类型', width: 120, sort: true},//货币类型
+                {field: 'charset', title: '字符编码', width: 120, sort: true},//字符编码
+                {field: 'configRemarks', title: '描述', width: 400},//描述
+                {fixed: 'right', title: '操作', width: 150, align: 'center', toolbar: '#barBtns'} //操作按钮
+            ]],
+            url: "/admin/acp/o_list.json", //翻页请求url
+            method: "POST", //请求HTTP类型
+            where: {bizCode: '${bizCode }' + '01', configName: $('#configName').val(), configCode: $('#configCode').val(), channelId: "${acp.channelId!''}"}, //请求参数
+            request: {//请求
+                pageName: 'pageNum', //页码的参数名称，默认：page,参数会自动获取并传递到后台
+                limitName: 'pageSize' //每页数据量的参数名，默认：limit,参数会自动获取并传递到后台
+            },
+            response: {//响应
+                statusCode: '00000', //成功的状态码，默认：0
+                statusName: 'status', //数据状态的字段名称，默认：code
+                msgName: 'msg', //状态信息的字段名称，默认：msg
+                countName: 'count', //数据总数的字段名称，默认：count
+                dataName: 'data' //数据列表的字段名称，默认：data
+            }
+        });
+
+        //方法
+        var active = {
+            add: function () { //新增方法
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2, //返回iframe类型
+                    title: "新增渠道支付配置", //弹出框标题
+                    area: ['700px', '500px'], //设置宽高
+                    shade: 0.3, //遮罩效果
+                    maxmin: true, //允许最大最小化
+                    content: "/admin/acp/v_add.do?bizCode=${bizCode }02", //请求URL获取页面
+                    zIndex: 999, //重点1：层级
+                    success: function(layero, index) {//成功后注入事件，不然js在页面完成完成之前就执行，点击没有效果
+                        layer.setTop(layero); //重点2
+                    }
+                });
+            },
+            deleteByIds: function () {
+                //多窗口模式，层叠置顶
+                var length = getCheckDataLength();
+                if (length == 0) {
+                    layer.alert('请先选择要删除的记录', {'title': '温馨提示：'});
+                    return;
+                }
+                //获取选中的数据Id
+                var data = getCheckData();//选中的数据集合
+                var ids = new Array(length);//存放id
+                for (var index = 0; index < length; index++) {
+                    ids[index] = data[index].id;
+                }
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定删除所选的' + getCheckDataLength() + '条记录吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function () {//确定
+                        //异步删除
+                        $.ajax({
+                            url: "/admin/acp/deleteByIds.do?bizCode=${bizCode }04",
+                            type: "POST",
+                            data: {'ids': ids},
+                            dataType: "JSON",
+                            success: function (data) {
+                                layer.msg(data.msg);
+                                if (data.status == "00000") {
+                                    layui.table.reload("table");
+                                }
+                            }
+                        });
+                    },
+                    btn2: function () {//取消
+                        layer.closeAll();
+                    }
+                });
+            }
+        };
+        //为按钮注入事件
+        $('.save, .delete').on('click', function() {
+            var $othis = $(this), $method = $othis.data('method');
+            active[$method] ? active[$method].call(this, $othis) : '';
+        });
+
+    });
+</script>
+</html>

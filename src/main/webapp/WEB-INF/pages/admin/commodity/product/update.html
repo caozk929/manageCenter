@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="${path}/resource/layui/css/layui.css"/>
+    <script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+    <script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+    <script src="${path}/resource/select2/4.0.3/js/select2.full.min.js"></script>
+    <link href="${path}/resource/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+    <script src="${path}/resource/select2/4.0.3/js/i18n/zh-CN.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".js-multiple").select2({
+                placeholder: '请选择',//默认文字提示
+                language: "zh-CN",
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    url: "${path}/admin/commodity/attributeKey/select.json?bizCode=${bizCode}06",
+                    dataType: 'json',
+                    data: function (params) {
+                        console.log(params.term);
+                        return {attributeKeyName: params.term};
+                    },
+                    processResults: function (data) {
+                        console.log(data);
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+            <#if categorymodify ??>
+            var info = JSON.parse('${tree}');
+            $(".js-single").select2({
+                placeholder: '请选择',//默认文字提示
+                language: "zh-CN",
+                data: info,
+                escapeMarkup: function (markup) {
+                    return markup;
+                },
+                templateResult: formatRepo,
+            });
+            function formatRepo(repo) {
+                return repo.description;
+            }
+
+            </#if>
+
+        });
+        layui.use(['form', 'layer', 'table', 'upload'], function () {
+            var form = layui.form, layer = layui.layer, table = layui.table, upload = layui.upload, $ = layui.jquery;//图片上传
+
+            //缩略图上传
+            var uploadInst = upload.render({
+                elem: '#upload',
+                url: '/admin/file/uploadFile.do',
+                data: {'bizCode': '${bizCode}'},
+                before: function (obj) {//文件上传之前的回调，用于删除旧的图片
+                    deleteImg();//异步删除
+                },
+                done: function (res) {
+                    if (res.respCode == "00000") {//上传成功
+                        //1.设置路径
+                        $('#img').attr('src', res.files[0].filePath);
+                        $('#synopsisUrl').val(res.files[0].filePath);
+                    } else {//如果上传失败
+                        layer.alert(res.respMsg);
+                    }
+                },
+                error: function () {
+                    //演示失败状态，并实现重传
+                    var demoText = $('#uploadText');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini img-reload">重试</a>');
+                    demoText.find('.img-reload').on('click', function () {
+                        uploadInst.upload();
+                    });
+                }
+            });
+
+            //删除图片方法
+            $('#delImg').click(function () {
+                deleteImg();//异步删除
+            });
+
+            function deleteImg() {
+                //异步调用接口方法删除图片
+                var fileUrl = $('#synopsisUrl').val();
+                if (fileUrl) {
+                    $.ajax({
+                        url: '/admin/file/deleteFile.do',
+                        type: "POST",
+                        data: {"fileUrl": fileUrl},
+                        dataType: "JSON",
+                        success: function (res) {
+                            if (res.status == "00000") {
+                                var demoText = $('#uploadText');
+                                demoText.html('');
+                                $('#img').attr('src', '');
+                                $('#synopsisUrl').val('');
+                            }
+                        }
+                    });
+                }
+            }
+
+            //商品信息
+            form.on('submit(save)', function (data) {
+                <#if categorymodify ??>
+                var categoryCode = $("#categoryCode").val();
+                if (null == categoryCode) {
+                    layer.msg('商品类目不能为空', {icon: 5});
+                    return false;
+                }
+                <#else>
+                var categoryCode = "${product.categoryCode!''}";
+                </#if>
+                var url = "${path}/admin/commodity/product/save.do?bizCode=${bizCode}02&categoryCode=" + categoryCode;
+                updateContent();//同步富文本编辑器内容
+                $.post(url, $("#mainForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            parent.location.reload();
+                            return true;
+                        }, 1000);
+                    } else {
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            });
+
+            //配置单品属性键
+            form.on('submit(saveAttrKey)', function (data) {
+                var url = "${path}/admin/commodity/product/setAttributeKey.do";
+                $.post(url, $("#attrKeyForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                            return true;
+                        }, 1000);
+                    } else {
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            });
+
+            //设置单品属性
+            table.init('tblMain', {
+                width: 612,
+                page: true,
+                even: true,
+                id: 'idMain',
+                url: '${path}/admin/commodity/product/attributeKey.json',
+                method: 'POST',
+                where: {bizCode: '${bizCode}06', productCode: '${product.productCode!''}'},
+                limits: layui.globalConfig.limits,
+                limit: 10,
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+                },
+                response: {
+                    statusName: 'status',
+                    statusCode: '00000', //成功的状态码，默认：0
+                    msgName: 'msg', //状态信息的字段名称，默认：msg
+                    countName: 'count', //数据总数的字段名称，默认：count
+                    dataName: 'data'
+                }
+            });
+            //监听单元格编辑
+            table.on('edit(tblMain)', function (obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                data[field] = value; //更新缓存中的值
+            });
+            table.on('tool(tblMain)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'sort') {
+                    sort(layer, data.id, data.attributeKeyOrder);
+                }
+            });
+
+            //单品管理
+            table.init('tblGoods', {
+                width: 960,
+                page: true,
+                even: true,
+                id: 'idGoods',
+                url: '${path}/admin/commodity/product/goods.json',
+                method: 'POST',
+                where: {bizCode: '${bizCode}10', productCode: "${product.productCode!''}"},
+                limits: layui.globalConfig.limits,
+                limit: 10,
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+                },
+                response: {
+                    statusName: 'status',
+                    statusCode: '00000', //成功的状态码，默认：0
+                    msgName: 'msg', //状态信息的字段名称，默认：msg
+                    countName: 'count', //数据总数的字段名称，默认：count
+                    dataName: 'data'
+                }
+            });
+            //监听表格复选框选择
+            table.on('checkbox(tblGoods)', function (obj) {
+                console.log(obj)
+            });
+            //监听工具条
+            table.on('tool(tblGoods)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+                    layer.confirm('确定删除该条数据吗', function (index) {
+                        del(layer, data.goodsCode)
+                    });
+                } else if (obj.event === 'save') {
+                    save(layer, data);
+                } else if (obj.event === 'addOrUpdate') {
+                    addOrUpdate(layer, data.goodsCode);
+                }
+            });
+            //监听单元格编辑
+            table.on('edit(tblGoods)', function (obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                data[field] = value; //更新缓存中的值
+            });
+
+            //获取勾选中的数据
+            function getCheckData(id) {
+                var checkStatus = table.checkStatus(id);//根据ID获取表格
+                return checkStatus.data;
+            }
+
+            //获取勾选中的数据数量
+            function getCheckDataLength(id) {
+                var checkStatus = table.checkStatus(id);//根据ID获取表格
+                return checkStatus.data.length;
+            }
+
+            var $ = layui.$, active = {
+                add: function () { //新增单品信息
+                    var goodsCode = "";
+                    addOrUpdate(layer, goodsCode);
+                }
+                , deleteChecks: function () {
+                    //多窗口模式，层叠置顶
+                    var data = getCheckData("idGoods");//选中的数据集合
+                    var goodsCode = "";
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 0) {
+                            goodsCode = data[i].goodsCode;
+                        } else {
+                            goodsCode += "," + data[i].goodsCode;
+                        }
+                    }
+                    //确认框
+                    layer.open({//配置样式
+                        type: 0,//信息框
+                        title: '温馨提示：',
+                        content: '确定删除所选的数据吗？',
+                        shahe: 0.3,//遮罩效果
+                        time: 5000,//5秒没有点击自动关闭
+                        btn: ['确定', '取消'],
+                        yes: function () {//确定
+                            del(layer, goodsCode);
+                        },
+                        btn2: function () {//取消
+                            layer.closeAll();
+                        }
+                    });
+                }
+
+            };
+            $('.layui-btn').on('click', function () {
+                var $method = $(this).data('method');
+                active[$method] ? active[$method].call(this) : '';
+            });
+        });
+
+
+        function addOrUpdate(layer, goodsCode) {
+            var url = "${path}/admin/commodity/product/addOrUpdateGoods.do?bizCode=${bizCode}12&id=${product.id!''}&goodsCode=" + goodsCode;
+            openLayer(layer, url, '新增/修改单品信息', '700px', '500px');
+        }
+        function openLayer(layer, url, header, width, heigth) {
+            layer.open({
+                type: 2 //返回iframe类型
+                , title: header
+                , area: [width, heigth]//窗口大小
+                , shade: 0.3//显示透明罩效果
+                , maxmin: true
+                , btnAlign: 'c'//按钮位置居中
+                , content: url
+                , zIndex: 999 //重点1：层级
+                , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+
+
+        function sort(layer, id, attributeKeyOrder) {
+            $.ajax({
+                url: "${path}/admin/commodity/product/allocationAttrKey.do?bizCode=${bizCode}07",
+                type: "POST",
+                data: {"id": id, "attributeKeyOrder": attributeKeyOrder},
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.status == "00000") {
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        }
+
+        function save(layer, info) {
+            $.ajax({
+                url: "${path}/admin/commodity/product/saveGoodsAttribute.do?bizCode=${bizCode}11",
+                type: "POST",
+                data: info,
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.status == "00000") {
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        }
+
+        function del(layer, goodsCode) {
+            $.ajax({
+                url: "${path}/admin/commodity/product/delGoods.do?bizCode=${bizCode}11",
+                type: "POST",
+                data: {"goodsCode": goodsCode},
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.status == "00000") {
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            layui.table.reload("idGoods");
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+    <title>编辑 商品信息</title>
+</head>
+<body>
+<div style="margin: 20px;">
+    <#if categorymodify??>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品类目</label>
+            <div class="layui-input-block">
+                <select class="js-single" style="width:550px;" id="categoryCode">
+                    <option value="${product.categoryCode!''}" selected>${product.categoryName!''}</option>
+                </select>
+            </div>
+        </div>
+    </#if>
+    <form class="layui-form" id="mainForm" action="">
+        <input type="hidden" name="id" value="${product.id!''}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品类目</label>
+            <div class="layui-input-block">
+                <input type="text" value="${product.categoryName!''}" name="categoryName" readonly class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品代码</label>
+            <div class="layui-input-block">
+                <input
+                <#if product.productCode??>readonly</#if>
+                type="text" name="productCode" value="${product.productCode!''}" required lay-verify="required"
+                placeholder="请输入商品代码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="productName" value="${product.productName!''}" required lay-verify="required"
+                       placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品品牌</label>
+            <div class="layui-input-block">
+                <input type="text" name="brand" value="${product.brand!''}" required lay-verify="required"
+                       placeholder="请输入商品品牌" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">型号/系列</label>
+            <div class="layui-input-block">
+                <input type="text" name="series" value="${product.series!''}" required lay-verify="required"
+                       placeholder="请输入型号/系列" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">计量单位</label>
+            <div class="layui-input-block">
+                <input type="text" name="unit" value="${product.unit!''}" required lay-verify="required"
+                       placeholder="请输入计量单位" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="productType" value="0" title="实体"
+                <#if product.productType==0> checked</#if>
+                >
+                <input type="radio" name="productType" value="1" title="虚拟"
+                <#if product.productType==1> checked</#if>
+                >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否启用</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" value="1"
+                <#if product.status?? && product.status==1> checked</#if>
+                lay-skin="switch">
+            </div>
+        </div>
+
+        <!--缩略图-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">缩略图
+                <button type="button" class="layui-btn layui-btn-mini" id="upload">选择图片</button>
+                <button type="button" class="layui-btn layui-btn-mini" style="margin-top: 5px;" id="delImg">删除图片
+                </button>
+            </label>
+            <div class="layui-input-block">
+                <img class="layui-upload-img" id="img" src="${product.synopsisUrl!'' }" alt=""/>
+                <p id="uploadText"></p>
+            </div>
+            <input id="synopsisUrl" name="synopsisUrl" type="hidden" value="${product.synopsisUrl!'' }"/>
+        </div>
+
+        <!--商品详情-->
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">商品详情</label>
+            <div class="layui-input-block">
+                <textarea id="details" name="details" cols="20" rows="2" class="ckeditor"><#if product??>${product.details!'' }</#if></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>配置此商品下单品的特有属性</legend>
+</fieldset>
+
+<div style="margin: 20px;">
+    <blockquote class="site-text">
+        <form action="" id="attrKeyForm">
+            <select class="js-multiple" style="width:600px" multiple="multiple" name="attributeKeys">
+                <#if lstAttributeKey?? && lstAttributeKey?size != 0>
+                    <#list lstAttributeKey?sort_by("attributeKeyOrder") as attributeKey>
+                        <option value="${attributeKey.attributeKeyCode!''}" selected>
+                            ${attributeKey.attributeKeyName!''}
+                        </option>
+                    </#list>
+                </#if>
+            </select>
+            <input type="hidden" name="id" value="${product.id!''}">
+            <input type="hidden" name="bizCode" value="${bizCode!''}07">
+            <button lay-submit lay-filter="saveAttrKey" class="layui-btn"><i class="layui-icon">&#xe608;</i>配置</button>
+        </form>
+    </blockquote>
+</div>
+
+<div style="margin: 20px;">
+    <table class="layui-table" lay-filter="tblMain">
+        <thead>
+        <tr>
+            <th lay-data="{field:'attributeKeyName', width:160}">名称</th>
+            <th lay-data="{field:'attributeKeyCode', width:160}">编码</th>
+            <th lay-data="{field:'attributeKeyTypeStr', width:80}">类型</th>
+            <th lay-data="{field:'attributeKeyOrder', width:80, edit: 'text', fixed: 'right'}">排序</th>
+            <th lay-data="{fixed: 'right', width:125, align:'center', toolbar: '#barMain'}">操作</th>
+        </tr>
+        </thead>
+    </table>
+    <script type="text/html" id="barMain">
+        <a class="layui-btn layui-btn-mini" lay-event="sort">排序</a>
+    </script>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>此商品下所有单品</legend>
+</fieldset>
+<div style="margin: 20px;">
+    <button class="layui-btn" data-method="add">新增单品</button>
+    <button class="layui-btn" data-method="deleteChecks">删除所选</button>
+    <table class="layui-table" lay-filter="tblGoods">
+        <thead>
+        <tr>
+            <th lay-data="{checkbox:true, fixed: true}"></th>
+            <th lay-data="{field:'goodsCode', width:160}">单品编码</th>
+            <th lay-data="{field:'goodsCount', width:100}">单品库存</th>
+            <#if lstAttributeKey?? && lstAttributeKey?size !=0>
+                <#list lstAttributeKey?sort_by("attributeKeyOrder") as attributeKey>
+                    <th lay-data="{field:'attr_${attributeKey.attributeKeyCode!''}', width:100}">
+                        ${attributeKey.attributeKeyName!''}
+                    </th>
+                </#list>
+            </#if>
+            <th lay-data="{fixed: 'right', width:125, align:'center', toolbar: '#barGoods'}">操作</th>
+        </tr>
+        </thead>
+    </table>
+    <script type="text/html" id="barGoods">
+        <a class="layui-btn layui-btn-mini" data-code="data.goodsCode" lay-event="addOrUpdate">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </script>
+</div>
+</body>
+<input type="hidden" id="bizCode" value="${bizCode }">
+<!--ckeditor富文本编辑器核心js-->
+<script src="/resource/ckeditor/ckeditor.js"></script>
+<!--ckeditor富文本编辑器配置-->
+<script>
+    var bizCode = $('#bizCode').val().substring(0, 5);
+    window.bizCode=bizCode;
+    CKEDITOR.replace('details', {
+        //替换默认图片上传路径
+        filebrowserImageUploadUrl: '/admin/file/ckeditorUploadImg.do?bizCode=' + bizCode
+    });
+    //ckeditor富文本编辑器内容需要更新后才可以和表单一起提交
+    function updateContent() {
+        for (instance in CKEDITOR.instances) {
+            CKEDITOR.instances[instance].updateElement();
+        }
+    }
+</script>
+</html>

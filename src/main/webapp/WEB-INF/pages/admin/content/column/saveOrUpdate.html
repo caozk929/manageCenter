@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/编辑 栏目</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+</head>
+<body>
+    <div style="margin: 20px;">
+        <form id="columnForm" class="layui-form" action="" method="post">
+
+            <!-- 渠道-->
+            <#if channels?? && channels?size != 0>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><sapn style="color: red;">*</sapn>渠道</label>
+                    <div class="layui-input-block">
+                        <select name="channelId">
+                            <#list channels as channel>
+                                <#if column?? && column.channelId?? && column.channelId == channel.id>
+                                    <option selected value="${channel.id }">${channel.channelName!'' }</option>
+                                <#else>
+                                    <option value="${channel.id }">${channel.channelName!'' }</option>
+                                </#if>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+            </#if>
+
+            <!-- 标题 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>栏目名称</label>
+                <div class="layui-input-block">
+                    <#if column??>
+                        <input type="text" name="title" value="${column.title!'' }" maxlength="64" required  lay-verify="required" placeholder="请输入栏目名称" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="title" maxlength="64" required  lay-verify="required" placeholder="请输入栏目名称" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!-- 编码 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>栏目编码</label>
+                <div class="layui-input-block">
+                    <#if column??>
+                        <input type="text" name="code" value="${column.code!'' }" maxlength="64" required  lay-verify="required" placeholder="请输入栏目编码" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="code" maxlength="32" required  lay-verify="required" placeholder="请输入栏目编码" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!--序号-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>栏目序号</label>
+                <div class="layui-input-block">
+                    <#if column??>
+                        <input type="text" name="sort" maxlength="11" value="${column.sort!'0' }" required  lay-verify="required" placeholder="请输入栏目序号" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="sort" maxlength="11" required  lay-verify="required" placeholder="请输入栏目序号" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!--状态-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>栏目状态</label>
+                <div class="layui-input-block">
+                    <#if column?? && column.status == 0>
+                        <input type="radio" name="status" value="1" title="启用">
+                        <input type="radio" name="status" value="0" title="停用" checked>
+                    <#else>
+                        <input type="radio" name="status" value="1" title="启用" checked>
+                        <input type="radio" name="status" value="0" title="停用">
+                    </#if>
+                </div>
+            </div>
+            <!-- 备注-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <#if column??>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......">${column.remarks!'' }</textarea>
+                    <#else>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......"></textarea>
+                    </#if>
+                </div>
+            </div>
+            <!-- 按钮-->
+            <div class="layui-form-item">
+                <div style="width: 80%; margin: 0 auto; text-align: center;">
+                    <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+                </div>
+            </div>
+            <#if column??>
+                <input id="columnId" type="hidden" name="id" value="${column.id!'' }"/>
+            </#if>
+        </form>
+    </div>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode }">
+    </#if>
+</body>
+<!-- JS -->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/js/common/jquery.cookie.js"></script>
+<script src="/resource/layui/layui.all.js"></script>
+<script>
+    var bizCode = $('#bizCode').val().substring(0, 5);
+    var result = true;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                result = false;
+                var url = "/admin/content/column/saveOrUpdate.do?bizCode=";
+                var $columnId = $('#columnId').val();
+                if ($columnId) {
+                    url += bizCode + "03";
+                } else {
+                    url += bizCode + "02";
+                }
+                $.post(url, $("#columnForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.layui.table.reload("table");
+                            parent.layer.close(index);
+                        }, 2000);
+                    } else {
+                        result = true;
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            }
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>菜单管理</title>
+    <link rel="stylesheet" type="text/css" href="/resource/css/system/menu/base.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/resource/css/system/menu/tree_structure.css">
+    <script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+    <style>
+        .catalog_list_content .catalog_tree_item {
+            width: 20%;
+        }
+        .catalog_list_content .width30{
+            word-break:break-all;
+            word-wrap:break-word;
+        }
+    </style>
+</head>
+<body>
+<!-- 按钮区域 -->
+<blockquote style="margin: 10px 20px 0; padding: 5px; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2;" class="site-text layui-elem-quote">
+    <@p.permission bizCode='${bizCode }02'>
+        <button data-id="" data-method="saveOrUpdate" class="layui-btn save"><i class="layui-icon">&#xe608;</i> 新增菜单</button>
+    </@p.permission>
+</blockquote>
+<section class="main">
+    <div class="box_content">
+        <!-----组织目录表格----->
+        <ul class="catalog_tree_tabal">
+            <!--头部标题-->
+            <li class="catalog_table_list catalog_table_top">
+                <dl class="catalog_list_content">
+                    <dt class="catalog_tree_item">菜单名称</dt>
+                    <dd>序号</dd>
+                    <dd>编码</dd>
+                    <dd>状态</dd>
+                    <dd class="width30">路径</dd>
+                    <dd class="tabel_operate catalog_operate">操作</dd>
+                </dl>
+            </li>
+            <!-------------------------菜单数据------------------------->
+            <#if menus?? && menus?size != 0>
+                <!--遍历一级菜单-->
+                <#list menus as item>
+                    <li id="li${item.id!'' }" class="catalog_table_list">
+                        <dl class="catalog_list_content">
+                            <dt class="catalog_tree_item" >
+                                <i id="i${item.id!'' }" class="catalog_tree_icon"></i>
+                                <i class="catalog_grade_icon"></i>
+                                <span>${item.name!'' }</span>
+                            </dt>
+                            <dd>${item.sort!'' }</dd>
+                            <dd>${item.code!'' }</dd>
+                            <dd>${item.statusStr!'' }</dd>
+                            <dd class="width30">${item.path }</dd>
+                            <dd class="tabel_operate catalog_operate">
+                                <@p.permission bizCode='${bizCode }04'>
+                                    <a href="javascript:;" data-id="${item.id!'' }" data-method="deleteById"
+                                       class="tabel_btn tabel_delect_icon" title="删除"></a>
+                                </@p.permission>
+                                <@p.permission bizCode='${bizCode }03'>
+                                    <a href="javascript:;" data-id="${item.id!'' }" data-method="saveOrUpdate"
+                                       class="tabel_btn tabel_edit_icon" title="编辑"></a>
+                                </@p.permission>
+                                <@p.permission bizCode='${bizCode }02'>
+                                    <a href="javascript:;" data-id="${item.id!'' }" data-method="addChildren"
+                                       class="tabel_btn tabel_detail_icon" title="添加下级"></a>
+                                </@p.permission>
+                            </dd>
+                        </dl>
+                        <!--遍历二级菜单-->
+                        <#if item.children?? && item.children?size != 0>
+                            <ul class="next_catalog_modular">
+                                <#list item.children as items>
+                                    <li id="li${items.id!'' }" class="catalog_table_list catalog_list_grade02"> <!--catalog_list_grade02为二级目录，三级为03，以此类推-->
+                                        <dl class="catalog_list_content">
+                                            <dt class="catalog_tree_item">
+                                                <i id="i${items.id!'' }" class="catalog_tree_icon"></i>
+                                                <i class="catalog_grade_icon"></i>
+                                                <span>${items.name!'' }</span>
+                                            </dt>
+                                            <dd>${items.sort!'' }</dd>
+                                            <dd>${items.code!'' }</dd>
+                                            <dd>${items.statusStr!'' }</dd>
+                                            <dd class="width30">${items.path!'' }</dd>
+                                            <dd class="tabel_operate catalog_operate">
+                                                <@p.permission bizCode='${bizCode }04'>
+                                                    <a href="javascript:;" data-id="${items.id!'' }" data-method="deleteById"
+                                                       class="tabel_btn tabel_delect_icon" title="删除"></a>
+                                                </@p.permission>
+                                                <@p.permission bizCode='${bizCode }03'>
+                                                    <a href="javascript:;" data-id="${items.id!'' }" data-method="saveOrUpdate"
+                                                       class="tabel_btn tabel_edit_icon" title="编辑"></a>
+                                                </@p.permission>
+                                                <@p.permission bizCode='${bizCode }02'>
+                                                    <a href="javascript:;" data-id="${items.id!'' }" data-method="addChildren"
+                                                       class="tabel_btn tabel_detail_icon" title="添加下级"></a>
+                                                </@p.permission>
+                                            </dd>
+                                        </dl>
+                                        <!--遍历三级菜单-->
+                                        <#if items.children?? && items.children?size != 0>
+                                            <ul class="next_catalog_modular">
+                                                <#list items.children as btn>
+                                                    <li id="li${btn.id!'' }" class="catalog_table_list catalog_list_grade03">
+                                                        <dl class="catalog_list_content">
+                                                            <dt class="catalog_tree_item">
+                                                                <i id="i${btn.id!'' }" class="catalog_tree_icon"></i>
+                                                                <i class="catalog_grade_icon"></i>
+                                                                <span>${btn.name!'' }</span>
+                                                            </dt>
+                                                            <dd>${btn.sort!'' }</dd>
+                                                            <dd>${btn.code!'' }</dd>
+                                                            <dd>${btn.statusStr}</dd>
+                                                            <dd class="width30">${btn.path!'' }</dd>
+                                                            <dd class="tabel_operate catalog_operate">
+                                                                <!-- 按钮不可以继续添加下级-->
+                                                                <@p.permission bizCode='${bizCode }04'>
+                                                                    <a href="javascript:;" data-id="${btn.id!'' }"
+                                                                       data-method="deleteById" class="tabel_btn tabel_delect_icon" title="删除"></a>
+                                                                </@p.permission>
+                                                                <@p.permission bizCode='${bizCode }03'>
+                                                                    <a href="javascript:;" data-id="${btn.id!'' }"
+                                                                       data-method="saveOrUpdate" class="tabel_btn tabel_edit_icon" title="编辑"></a>
+                                                                </@p.permission>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                </#list>
+                                            </ul>
+                                        </#if>
+                                    </li>
+                                </#list>
+                            </ul>
+                        </#if>
+                    </li>
+                </#list>
+            </#if>
+        </ul>
+    </div>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode!'' }">
+    </#if>
+</section>
+
+<!--------------------------------- JS ---------------------------------------->
+<script src="/resource/layui/layui.js"></script>
+
+<!-- -------------------------------按钮事件------------------------------- -->
+<script>
+    var bizCode = $('#bizCode').val();
+    layui.use('layer', function(){ //独立版的layer无需执行这一句
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+        //触发事件
+        var active = {
+            saveOrUpdate: function() {//新增修改方法
+                saveOpenIds();
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                //判断请求是新增还是编辑
+                var url = "/admin/menu/v_saveOrUpdate.do?bizCode=";
+                if ($id != null && $id != "") {//编辑
+                    url += bizCode + "03";
+                } else {//新增
+                    url += bizCode + "02";
+                }
+                //异步请求返回页面
+                $.post(url, {"id": $id}, function(data) {
+                    layer.open({
+                        type: 1 //返回html类型
+                        ,title: '新增/编辑 菜单'
+                        ,area: ['700px', '500px']//窗口大小
+                        ,shade: 0.3//显示透明罩效果
+                        ,maxmin: true
+                        ,btnAlign: 'c'//按钮位置居中
+                        ,btn: [] //按钮
+                        ,content: data
+                        ,zIndex: 999 //重点1：层级
+                        ,success: function(layero, index){//参数1：当前dom,参数2：索引
+                            layer.setTop(layero); //重点2
+                        }
+                    });
+                }, "HTML");
+            },
+            deleteById: function() {//删除方法
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定删除菜单吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function() {//确定
+                        //异步删除
+                        $.ajax({
+                            url: "/admin/menu/delete.do?bizCode=" + bizCode + "04",
+                            type: "POST",
+                            data: {"id": $id},
+                            dataType: "JSON",
+                            success: function(data) {
+                                layer.msg(data.msg);
+                                if (data.status == "00000") {
+                                    $('#li' + $id).remove();//删除对应的元素节点
+                                }
+                            }
+                        });
+                    },
+                    btn2: function() {//取消
+                        layer.closeAll();
+                    }
+                });
+            },
+            addChildren: function() {
+                saveOpenIds();
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                if ($id == null || $id == '') {
+                    layer.msg("参数错误...");
+                    return;
+                }
+                $.post("/admin/menu/v_addChildren.do?bizCode=" + bizCode + "02", {"id": $id}, function(data) {
+                    layer.open({
+                        type: 1 //返回html类型
+                        ,title: '新增下级菜单'
+                        ,area: ['700px', '500px']//窗口大小
+                        ,shade: 0.3//显示透明罩效果
+                        ,maxmin: true
+                        ,btnAlign: 'c'//按钮位置居中
+                        ,btn: [] //按钮
+                        ,content: data
+                        ,zIndex: 999 //重点1：层级
+                        ,success: function(layero, index){//参数1：当前dom,参数2：索引
+                            layer.setTop(layero); //重点2
+                        }
+                    });
+                }, "HTML");
+            }
+        };
+        //保存事件//编辑事件//删除事件//添加下级事件
+        $('.layui-btn, .tabel_edit_icon, .tabel_delect_icon, .tabel_detail_icon').on('click', function() {
+            var $othis = $(this), $method = $othis.data('method');
+            active[$method] ? active[$method].call(this, $othis) : '';
+        });
+    });
+</script>
+<!--解决新增、编辑刷新页面后树收缩-->
+<script>
+    //保存打开的节点的Id,用于在刷新了页面后重新展开
+    function saveOpenIds() {
+        var arrays = new Array();
+        $('.hide').each(function(index, elm) {
+            arrays[index] = $(elm).children('i[id]').attr('id');
+        });
+        //H5新特性
+        localStorage.setItem("arrays", JSON.stringify(arrays));
+    }
+    $(function(){
+        /*----------判断是否有下级列表----------*/
+        $('.catalog_tree_item').each(function(index, element) {
+            if( $(element).parent().siblings().hasClass('next_catalog_modular')){
+                $(element).children('.catalog_tree_icon').addClass('current')
+                        .siblings('.catalog_grade_icon').css('background-position','-33px -63px')
+            }
+        });
+        /*----------下级列表收缩与展开----------*/
+        $('.catalog_tree_item .catalog_tree_icon').click(function(e) {
+            treeStatus($(this));
+        });
+        //重新校验树的状态展开收起
+        function treeStatus(elm) {
+            if($(elm).hasClass('current')){
+                $(elm).parent().toggleClass('hide')
+                        .parent().next().finish().slideToggle(300);
+            }
+        }
+        //获取树的状态节点，展开之前的
+        var arrs = JSON.parse(localStorage.getItem('arrays'));
+        if (arrs) {
+            for (var i = 0; i < arrs.length; i++) {
+                treeStatus($('#' + arrs[i]));
+            }
+        }
+    })
+</script>
+</body>
+</html>

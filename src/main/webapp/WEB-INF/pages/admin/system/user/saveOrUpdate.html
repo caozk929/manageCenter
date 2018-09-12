@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/编辑 用户</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <script src="/resource/layui/layui.all.js"></script>
+    <script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+    <script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+    <div style="margin: 20px;">
+        <form id="userForm" action="" class="layui-form" method="post">
+            <!-- 用户名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>用户昵称</label>
+                <div class="layui-input-block">
+                    <#if user??>
+                        <input type="text" name="nickName" value="${user.nickName!'' }" maxlength="18" placeholder="用户名称" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="nickName" maxlength="18" placeholder="用户名称" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+
+            <!-- 用户名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>用户名称</label>
+                <div class="layui-input-block">
+                    <#if user??>
+                        <input type="text" name="username" value="${user.username!'' }" maxlength="20" required  lay-verify="required" placeholder="用户名称" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="username" maxlength="20" required  lay-verify="required" placeholder="用户名称" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+
+            <!-- 登录密码-->
+            <#if !user??>
+            <div class="layui-form-item">
+                <label class="layui-form-label">登录密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="password" maxlength="32" placeholder="登录密码, 默认：123456" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            </#if>
+
+            <!-- 渠道-->
+            <#if channels?? && channels?size != 0>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">渠道类型</label>
+                    <div class="layui-input-block">
+                        <select name="channelId">
+                            <#list channels as channel>
+                                <#if user?? && user.channelId?? && user.channelId == channel.id>
+                                    <option selected value="${channel.id }">${channel.channelName!'' }</option>
+                                <#else>
+                                    <option value="${channel.id }">${channel.channelName!'' }</option>
+                                </#if>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+            </#if>
+
+            <!-- 角色-->
+            <#if roles?? && roles?size != 0>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色</label>
+                    <div class="layui-input-block" style="border: 1px solid #e6e6e6; border-radius: 2px; padding: 4px 0 8px 8px;">
+                        <#list roles as role>
+                            <input type="checkbox" name="roleIds" id="checkbox${role.id }" value="${role.id }" title="${role.name }" />
+                        </#list>
+                    </div>
+                </div>
+            </#if>
+
+            <!-- 手机号码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机号码</label>
+                <div class="layui-input-block">
+                    <#if user??>
+                        <input type="text" name="mobile" value="${user.mobile!'' }" maxlength="11" placeholder="手机号码" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="mobile" maxlength="11" placeholder="手机号码" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+
+            <!-- 邮箱-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-block">
+                    <#if user??>
+                        <input type="text" name="email" value="${user.email!'' }" maxlength="32" placeholder="邮箱" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="email" maxlength="32" placeholder="邮箱" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+
+            <!-- 备注-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <#if user??>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......">${user.remarks!'' }</textarea>
+                    <#else>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......"></textarea>
+                    </#if>
+                </div>
+            </div>
+
+            <!-- 按钮-->
+            <div class="layui-form-item">
+                <div style="width: 80%; margin: 0 auto; text-align: center;">
+                    <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+                </div>
+            </div>
+            <#if user??>
+                <input id="userId" type="hidden" name="id" value="${user.id!'' }"/>
+            </#if>
+        </form>
+    </div>
+    <#if roleIds??>
+        <input type="hidden" id="roleIds" value="${roleIds!'' }">
+    </#if>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode }">
+    </#if>
+</body>
+<script>
+    var bizCode = $('#bizCode').val();
+    var result = true;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                result = false;
+                var url = layui.globalConfig.adminUrl + "user/saveOrUpdate.do?bizCode=";
+                var $userId = $('#userId').val();
+                if ($userId) {
+                    url += bizCode + "03";
+                } else {
+                    url += bizCode + "02";
+                }
+                $.post(url, $("#userForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.href = "/admin/user/v_list.do?bizCode=" + bizCode;
+                            return true;
+                        }, 2000);
+                    } else {
+                        result = true;
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            }
+        });
+    });
+</script>
+<script>
+    $(function($) {
+        /* 初始化复选框样式 */
+        var $roleIds = $('#roleIds').val();
+        if ($roleIds) {
+            var $array = $roleIds.split(",");
+            for (var index = 0; index < $array.length; index++) {
+                $('#checkbox' + $array[index]).prop("checked", true);//checkbox选中
+                $('#checkbox' + $array[index] + "+ div").addClass('layui-form-checked');
+            }
+        }
+    });
+</script>
+
+</html>

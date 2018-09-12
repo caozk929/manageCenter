@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            var url = "${path}/admin/channelProduct/tag/save.do?bizCode=${bizCode}02";
+            $.post(url, $("#mainForm").serialize(), function(data){
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	parent.location.href="${path}/admin/channelProduct/tag/list.do?bizCode=${bizCode}";
+                        return true;
+                    }, 1000);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+    });
+</script>
+<title>新增/编辑 标签</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="mainForm" action="">		
+			<input type="hidden" name="id" value="${tag.id!''}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">标签名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="tagName" value="${tag.tagName!''}" required lay-verify="required" placeholder="请输入标签" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

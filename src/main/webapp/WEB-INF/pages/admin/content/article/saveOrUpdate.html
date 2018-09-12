@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/修改 文章</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+</head>
+<body>
+<div style="margin: 20px;">
+    <form id="articleForm" class="layui-form" action="" method="post">
+
+        <!-- 渠道-->
+        <#if channels?? && channels?size != 0>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>渠道</label>
+                <div class="layui-input-block">
+                    <select name="channelId">
+                        <#list channels as channel>
+                            <#if article?? && article.channelId?? && article.channelId == channel.id>
+                                <option selected value="${channel.id }">${channel.channelName!'' }</option>
+                            <#else>
+                                <option value="${channel.id }">${channel.channelName!'' }</option>
+                            </#if>
+                        </#list>
+                    </select>
+                </div>
+            </div>
+        </#if>
+
+        <!-- 标题 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label"><sapn style="color: red;">*</sapn>文章标题</label>
+            <div class="layui-input-block">
+                <#if article??>
+                    <input type="text" name="title" value="${article.title!'' }" maxlength="64" required  lay-verify="required" placeholder="请输入文章标题" autocomplete="off" class="layui-input">
+                <#else>
+                    <input type="text" name="title" maxlength="64" required  lay-verify="required" placeholder="请输入文章标题" autocomplete="off" class="layui-input">
+                </#if>
+            </div>
+        </div>
+        <!--栏目-->
+        <#if columns?? && columns?size != 0>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>文章栏目</label>
+                <div class="layui-input-block">
+                    <select name="columnId" lay-verify="">
+                        <#list columns as column>
+                            <#if article?? && column.id == article.columnId!''>
+                                <option selected value="${column.id }">${column.title }</option>
+                            <#else>
+                                <option value="${column.id }">${column.title }</option>
+                            </#if>
+                        </#list>
+                    </select>
+                </div>
+            </div>
+        </#if>
+        <!-- 发布时间 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布时间</label>
+            <div class="layui-input-block">
+                <#if article??>
+                    <input id="publishTime" type="text" name="publishTime" value="${article.publishTime?string('yyyy-MM-dd HH:mm:ss') }" placeholder="请输入发布时间" autocomplete="off" class="layui-input">
+                <#else>
+                    <input id="publishTime" type="text" name="publishTime" placeholder="请输入发布时间" autocomplete="off" class="layui-input">
+                </#if>
+            </div>
+        </div>
+        <!--序号-->
+        <div class="layui-form-item">
+            <label class="layui-form-label"><sapn style="color: red;">*</sapn>文章序号</label>
+            <div class="layui-input-block">
+                <#if article??>
+                    <input type="text" name="sort" maxlength="11" value="${article.sort!'0' }" required  lay-verify="required" placeholder="请输入文章序号" autocomplete="off" class="layui-input">
+                <#else>
+                    <input type="text" name="sort" maxlength="11" required  lay-verify="required" placeholder="请输入文章序号" autocomplete="off" class="layui-input">
+                </#if>
+            </div>
+        </div>
+        <!--状态-->
+        <div class="layui-form-item">
+            <label class="layui-form-label"><sapn style="color: red;">*</sapn>文章状态</label>
+            <div class="layui-input-block">
+                <#if article?? && article.status == 0>
+                    <input type="radio" name="status" value="1" title="启用">
+                    <input type="radio" name="status" value="0" title="停用" checked>
+                <#else>
+                    <input type="radio" name="status" value="1" title="启用" checked>
+                    <input type="radio" name="status" value="0" title="停用">
+                </#if>
+            </div>
+        </div>
+        <!--缩略图-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">缩略图
+                <button type="button" class="layui-btn layui-btn-mini" id="upload">选择图片</button>
+                <button type="button" class="layui-btn layui-btn-mini" style="margin-top: 5px;" id="delImg">删除图片</button>
+            </label>
+            <div class="layui-input-block">
+                <#if article??>
+                    <img class="layui-upload-img" id="img" src="${article.synopsisUrl!'' }" alt=""/>
+                <#else>
+                    <img class="layui-upload-img" id="img" src="" alt=""/>
+                </#if>
+                <p id="uploadText"></p>
+            </div>
+            <#if article??>
+                <input id="synopsisUrl" name="synopsisUrl" type="hidden" value="${article.synopsisUrl!'' }" />
+            <#else>
+                <input id="synopsisUrl" name="synopsisUrl" type="hidden" value="" />
+            </#if>
+        </div>
+        <!--简介-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">简介</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" style="height: 150px;" maxlength="500" name="synopsis" placeholder="简介......"><#if article??>${article.synopsis!'' }</#if></textarea>
+            </div>
+        </div>
+        <!--内容-->
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">文章内容</label>
+            <div class="layui-input-block">
+                <textarea id="content" name="content" cols="20" rows="2" class="ckeditor"><#if article??>${article.content!'' }</#if></textarea>
+            </div>
+        </div>
+        <!-- 按钮-->
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+            </div>
+        </div>
+        <#if article??>
+            <input id="articleId" type="hidden" name="id" value="${article.id!'' }"/>
+        </#if>
+    </form>
+</div>
+<#if bizCode??>
+    <input type="hidden" id="bizCode" value="${bizCode }">
+</#if>
+</body>
+<!-- JS -->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/js/common/jquery.cookie.js"></script>
+<script src="/resource/layui/layui.all.js"></script>
+<!--ckeditor富文本编辑器核心js-->
+<script src="/resource/ckeditor/ckeditor.js"></script>
+<!--ckeditor富文本编辑器配置-->
+<script>
+    var bizCode = $('#bizCode').val().substring(0, 5);
+    window.bizCode=bizCode;
+    CKEDITOR.replace('content', {
+        //替换默认图片上传路径
+        filebrowserImageUploadUrl: '/admin/file/ckeditorUploadImg.do?bizCode='+bizCode
+    });
+    //ckeditor富文本编辑器内容需要更新后才可以和表单一起提交
+    function updateContent() {
+        for(instance in CKEDITOR.instances){
+            CKEDITOR.instances[instance].updateElement();
+        }
+    }
+</script>
+<script>
+    var result = true;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    ;!function(){
+        var form = layui.form,//表单模块
+                $ = layui.jquery,
+                layer = layui.layer,
+                laydate = layui.laydate,
+                upload = layui.upload;//图片上传
+
+        laydate.render({
+            elem: '#publishTime', //指定元素
+            type: 'datetime', //日期格式类型
+        });
+
+        //缩略图上传
+        var uploadInst = upload.render({
+            elem: '#upload',
+            url: '/admin/file/uploadFile.do',
+            data: {'bizCode': bizCode},
+            before: function(obj) {//文件上传之前的回调，用于删除旧的图片
+                deleteImg();//异步删除
+            },
+            done: function(res) {
+                if (res.respCode == "00000") {//上传成功
+                    //1.设置路径
+                    $('#img').attr('src', res.files[0].filePath);
+                    $('#synopsisUrl').val(res.files[0].filePath);
+                } else {//如果上传失败
+                    layer.alert(res.respMsg);
+                }
+            },
+            error: function() {
+                //演示失败状态，并实现重传
+                var demoText = $('#uploadText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini img-reload">重试</a>');
+                demoText.find('.img-reload').on('click', function() {
+                    uploadInst.upload();
+                });
+            }
+        });
+        //删除图片方法
+        $('#delImg').click(function() {
+            deleteImg();//异步删除
+        });
+
+        function deleteImg() {
+            //异步调用接口方法删除图片
+            var fileUrl = $('#synopsisUrl').val();
+            if (fileUrl) {
+                $.ajax({
+                    url: '/admin/file/deleteFile.do',
+                    type: "POST",
+                    data: {"fileUrl": fileUrl},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status == "00000") {
+                            var demoText = $('#uploadText');
+                            demoText.html('');
+                            $('#img').attr('src', '');
+                            $('#synopsisUrl').val('');
+                        }
+                    }
+                });
+            }
+        }
+
+        form.on('submit(save)', function (data) {
+            if (result) {
+                result = false;
+                updateContent();//同步文章内容，获取到数据和表单一起提交
+                var url = "/admin/content/article/saveOrUpdate.do?bizCode=";
+                var $articleId = $('#articleId').val();
+                if ($articleId) {
+                    url += bizCode + "03";
+                } else {
+                    url += bizCode + "02";
+                }
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: $("#articleForm").serialize(),
+                    dataType: "JSON",
+                    success: function (data) {
+                        if (data.status == "00000") {//提示成功后重新加载数据
+                            layer.msg(data.msg);
+                            setTimeout(function () {
+                                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                parent.layui.table.reload("table");
+                                parent.layer.close(index);
+                            }, 2000);
+                        } else {
+                            result = true;
+                            layer.alert(data.msg);
+                        }
+                    }
+                });
+                return false;//出错则不关闭窗口
+            }
+        });
+    }();
+</script>
+</html>

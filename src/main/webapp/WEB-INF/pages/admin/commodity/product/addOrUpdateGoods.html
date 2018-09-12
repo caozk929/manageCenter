@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/修改 单品信息</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+</head>
+<body>
+<div style="margin: 20px;">
+    <form id="attributeKeyForm" class="layui-form" action="" method="post">
+
+        <!-- 单品编码-->
+        <#if goods?? && goods?size != 0 >
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <sapn style="color: red;">*</sapn>
+                    单品编码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="goodsCode" value="${goods.goodsCode!''}" maxlength="30" required
+                           lay-verify="required" readonly="readonly" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </#if>
+
+        <!-- 单品库存 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                库存</label>
+            <div class="layui-input-block">
+                <#if goods??>
+                    <input type="text" name="goodsCount" maxlength="30" value="${goods.goodsCount!'' }" required
+                           lay-verify="required" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" id="goodsCount" name="goodsCount"  maxlength="11" required lay-verify="required"
+                               placeholder="请输入商品库存" autocomplete="off" class="layui-input">
+                </#if>
+            </div>
+        </div>
+
+        <#if lstAttributeKey?? && lstAttributeKey?size !=0>
+            <#list lstAttributeKey as attributeKey>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <sapn style="color: red;">*</sapn>
+                        ${attributeKey.attributeKeyName!''}</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="attr" name="attr_${attributeKey.attributeKeyCode}" maxlength="30"
+                               value="${attributeKey.attributeValue!''}" required
+                               lay-verify="required" placeholder="请输入${attributeKey.attributeKeyName!''}" autocomplete="off" class="layui-input">
+                        </select>
+                    </div>
+                </div>
+            </#list>
+        </#if>
+
+        <#if goods??>
+            <input type="hidden" name="productCode" value="${goods.productCode!'' }">
+            <input type="hidden" name="id" value="${goods.id!'' }">
+        </#if>
+
+        <!-- 按钮-->
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-filter="edit" lay-submit>保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+<#if bizCode??>
+    <input type="hidden" id="bizCode" value="${bizCode }">
+</#if>
+<#if productId??>
+    <input type="hidden" id="productId" value="${productId }">
+</#if>
+
+</body>
+<!-- JS -->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/js/common/jquery.cookie.js"></script>
+<script src="/resource/layui/layui.all.js"></script>
+
+<script>
+    var flag = false;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    var bizCode = '${bizCode}';
+    if (bizCode) {
+        bizCode = bizCode.substring(0, 5) + 11;
+    }
+    layui.use(['form', 'upload'], function () {
+        var form = layui.form,//表单模块
+            $ = layui.jquery,
+            layer = layui.layer;
+        form.on('submit(edit)', function (data) {
+                if (flag) {
+                    return;
+                }
+
+                var productId = $("#productId").val();
+                var url = "/admin/commodity/product/saveGoodsAttribute.do?bizCode=" + bizCode + "&productId=" + productId ;
+                $.post(url, $("#attributeKeyForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.layui.table.reload("idGoods");
+                            parent.layer.close(index);
+                        }, 1000);
+                    } else {
+                        result = false;
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+
+            }
+        );
+
+    });
+
+
+</script>
+</html>

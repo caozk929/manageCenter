@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="${path}/resource/layui/css/layui.css"/>
+    <script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+    <script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+    <script>
+        layui.use(['form', 'upload'], function () {
+            var form = layui.form, upload = layui.upload;
+            //监听提交
+            form.on('submit(save)', function (data) {
+                var url = "${path}/admin/commodity/category/save.do?bizCode=${bizCode}02";
+                $.post(url, $("#mainForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            parent.location.reload();
+                            return true;
+                        }, 500);
+                    } else {
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            });
+
+            var bizCode = '${bizCode}';
+            upload.render({
+                elem: '#test8'
+                , url: '/admin/file/uploadFile.do'
+                , data: {'bizCode': bizCode}
+                , auto: false  //不自动上传
+                , accept: 'images' //上传文件类型
+                , bindAction: '#test9' //指定上传按钮
+                , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                    var oldFileUrl = $("[name='categoryImg']").val();
+                    if (oldFileUrl) {
+                        $("#delImage").click();
+                    }
+                }
+                , done: function (res) {
+                    //上传请求回调
+                    if (res.respCode == "00000") {
+                        $("#imageId").attr("src", res.files[0].filePath);
+                        $("[name='categoryImg']").val(res.files[0].filePath);
+                        $("#Img").removeClass('hidden');
+                    } else {
+                        layer.alert(res.respMsg);
+                    }
+
+                }
+            });
+
+            $("#delImage").click(function () {
+                var fileUrl = $("[name='categoryImg']").val();
+                $.ajax({
+                    url: '/admin/file/deleteFile.do',
+                    type: "POST",
+                    data: {"fileUrl": fileUrl, 'bizCode': bizCode},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status == "00000") {
+                            $("#Img").addClass('hidden');
+                            $("#imageId").attr("src", " ");
+                            $("[name='categoryImg']").val(" ");
+                        } else {
+                            layer.alert(res.msg);
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style>
+        .hidden {
+            display: none;
+        }
+        .upload-img{
+            width: 220px;
+            height: 200px;
+        }
+    </style>
+    <title>编辑 类目</title>
+</head>
+<body>
+<div style="margin: 20px;">
+    <form class="layui-form" id="mainForm" action="">
+        <input type="hidden" name="id" value="${category.id!''}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">类目代码</label>
+            <div class="layui-input-block">
+                <input type="text" name="categoryCode" value="${category.categoryCode!''}"
+                <#if category.id??> readonly="readonly"</#if>
+                autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类目名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="categoryName" value="${category.categoryName!''}" required
+                       lay-verify="required" placeholder="请输入类目名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <#if category.upCode??>
+            <div class="layui-form-item">
+                <label class="layui-form-label">上级类目</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="upCode" value="${category.upCode!''}">
+                    <input type="text" name="upName" value="${category.upName!''}"
+                    <#if category.id??>readonly="readonly"
+                        <#else>placeholder="请输入上级类目"
+                    </#if>
+                    autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </#if>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否启用</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" value="1"
+                <#if category.status?? && category.status==1> checked</#if>
+                lay-skin="switch">
+            </div>
+        </div>
+        <!--图片地址 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                图片地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="categoryImg" maxlength="170" required lay-verify="required"
+                       readonly="true" autocomplete="off" class="layui-input" value="${category.categoryImg!'' }">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-normal" id="test8">选择图片</button>
+                <button type="button" class="layui-btn" id="test9">开始上传</button>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;" id="Img">
+                    预览图：
+                    <div class="layui-upload-list" id="demo2"></div>
+                    <img src="${category.categoryImg!'' }" class="upload-img" id="imageId">
+                    <br>
+                    <button type="button" class="layui-btn layui-btn-normal" id="delImage">删除图片</button>
+                </blockquote>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="${path}/resource/ckeditor/ckeditor.js"></script>
+<script src="${path}/resource/select2/4.0.3/js/select2.full.min.js"></script>
+<link href="${path}/resource/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+<script src="${path}/resource/select2/4.0.3/js/i18n/zh-CN.js"></script>
+<script>
+    layui.use(['form', 'table', 'layer', 'laydate'], function() {
+        var form = layui.form, layer = layui.layer, table = layui.table, laydate = layui.laydate;
+        //创建一个编辑器
+
+        //监听提交
+        form.on('submit(save)', function(data) {
+        	var gmtOnSell = $('#gmtOnSell').val();
+        	var gmtOffSell = $('#gmtOffSell').val();
+        	if(gmtOnSell != '' && gmtOffSell != '') {
+        		if(gmtOffSell <= gmtOnSell) {
+        			layer.msg('下架时间不能小于上架时间', {icon: 5});
+        			return false;
+        		}
+        	}
+        	var tags = $(".js-productTag").val();
+            var url = "${path}/admin/channelProduct/save.do?bizCode=${bizCode}03&tags=" + tags;
+            //layedit.sync(index);//同步编辑器的内容到textarea
+            updateContent();//同步文章内容，获取到数据和表单一起提交
+            $.post(url, $("#mainForm").serialize(), function(data){
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	location.reload();
+                        return true;
+                    }, 1000);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+        
+		  table.init('tblMain', {
+			  page:true, 
+			  even: true,
+			  id:'idMain',
+		            url: '${path}/admin/channelProduct/goods.json',
+		            method:'POST',
+		            where : {bizCode:'${bizCode}03', productCode:'${channelProduct.productCode!''}', channelProductCode:'${channelProduct.channelProductCode!''}'},
+		            limits: layui.globalConfig.limits,
+		            limit: 10,
+		            request: {
+		                pageName: 'pageNum', //页码的参数名称，默认：page
+		                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+		            },
+		            response: {
+		            	statusName: 'status',
+		            	statusCode: '00000', //成功的状态码，默认：0
+		                msgName: 'msg', //状态信息的字段名称，默认：msg
+		                countName: 'count', //数据总数的字段名称，默认：count
+		                dataName: 'data'
+		            }			  
+		  }); 		  
+		  //监听表格复选框选择
+		  table.on('checkbox(tblMain)', function(obj){
+		    console.log(obj)
+		  });
+		  //监听工具条
+		  table.on('tool(tblMain)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'del'){
+		      layer.confirm('真的删除行么', function(index){
+		        del(layer, data.id)
+		      });
+		    } else if(obj.event === 'save'){
+			  	save(layer, data);
+			} else if(obj.event === 'tag'){
+				tag(layer, data.id);
+			} else if(obj.event === 'strategy'){
+				strategy(layer, data.id);
+			} else if(obj.event === 'uploadLogo'){
+                uploadLogo(layer, data.id);
+            }
+          });
+		  //监听单元格编辑
+		  table.on('edit(tblMain)', function(obj) {
+		      var value = obj.value, data = obj.data, field = obj.field;		  
+			  data[field] = value; //更新缓存中的值
+		  });		  
+		  
+		  var $ = layui.$, active = {
+		    getCheckData: function(){ //获取选中数据
+		      var checkStatus = table.checkStatus('idMain')
+		      ,data = checkStatus.data;
+		      layer.alert(JSON.stringify(data));
+		    }
+		    ,getCheckLength: function(){ //获取选中数目
+		      var checkStatus = table.checkStatus('idMain')
+		      ,data = checkStatus.data;
+		      layer.msg('选中了：'+ data.length + ' 个');
+		    }
+		    ,isAll: function(){ //验证是否全选
+		      var checkStatus = table.checkStatus('idMain');
+		      layer.msg(checkStatus.isAll ? '全选': '未全选');
+		    }
+		    , add: function() {
+		    	//$("#add").submit();
+		    	add(layer);
+		    }
+		  };
+		  
+	      $('.layui-btn').on('click', function() {
+	          var $method = $(this).data('method');
+	          active[$method] ? active[$method].call(this) : '';	          
+	      });  	
+	      
+	        laydate.render({
+	            elem: '#gmtOnSell', //指定元素
+	            type: 'datetime', //日期格式类型
+	        });
+	        laydate.render({
+	            elem: '#gmtOffSell', //指定元素
+	            type: 'datetime', //日期格式类型
+	        });	        
+    });
+
+    function uploadLogo(layer, id) {
+        var url = "${path}/admin/channelProduct/updateChannelGoods.do?bizCode=${bizCode}09&id=" + id;
+        openLayer(layer, url, '上传LOGO图片', '700px', '600px');
+    }
+    function openLayer(layer, url, header, width, heigth) {
+        layer.open({
+            type: 2 //返回iframe类型
+            , title: header
+            , area: [width, heigth]//窗口大小
+            , shade: 0.3//显示透明罩效果
+            , maxmin: true
+            , btnAlign: 'c'//按钮位置居中
+            , content: url
+            , zIndex: 999 //重点1：层级
+            , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
+  	function save(layer, info) {
+        $.ajax({
+            url: "${path}/admin/channelProduct/goodsSave.do?bizCode=${bizCode}04",
+            type: "POST",
+            data: info,
+            dataType: "JSON",
+            success: function (data) {
+                if (data.status == "00000") {
+                    layer.msg(data.msg);
+                    setTimeout(function () {
+                    	location.href=location.href;
+                    }, 1000);
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    }    
+    
+	function del(layer, id) {
+        $.ajax({
+            url: "${path}/admin/channelProduct/goodsDel.do?bizCode=${bizCode}04",
+            type: "POST",
+            data: {"id" : id},
+            dataType: "JSON",
+            success: function (data) {
+                if (data.status == "00000") {
+                    layer.msg(data.msg);
+                    setTimeout(function () {
+                    	location.reload(); 
+                    }, 1000);
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    }  
+	
+	function tag(layer, id) {
+        var url = "${path}/admin/channelProduct/tagGoods.do?bizCode=${bizCode}06";
+        //异步请求返回页面
+        $.post(url, {"id": id}, function (data) {
+            layer.open({
+                type: 1 //返回html类型
+                , title: '单品 标签'
+                , area: ['700px', '200px']//窗口大小
+                , shade: 0.3//显示透明罩效果
+                , maxmin: true
+                , btnAlign: 'c'//按钮位置居中
+                , content: data
+                , zIndex: 999 //重点1：层级
+                , success: function (layero, index) {//参数1：当前dom,参数2：索引
+            		$(".js-multiple").select2({
+                        placeholder:'请选择',//默认文字提示
+                        language: "zh-CN",
+                        allowClear: true,
+                        ajax: {
+                            delay: 250,
+                            url: "${path}/admin/channelProduct/tag/select.json?bizCode=${bizCode}06",
+                            dataType: 'json',
+                            data: function (params) {
+                            	console.log(params.term);
+                                return {tagName: params.term};
+                            },
+                            processResults: function (data) {
+                                console.log(data);
+                                return {
+                                  results: data
+                                };
+                            }
+                        }
+                    });	
+                }                
+            });
+        }, "HTML");
+    } 
+	
+	
+	function strategy(layer, id) {
+        var url = "${path}/admin/channelProduct/strategyGoods.do?bizCode=${bizCode}07";
+        //异步请求返回页面
+        $.post(url, {"id": id}, function (data) {
+            layer.open({
+                type: 1 //返回html类型
+                , title: '单品 策略'
+                , area: ['1100px', '500px']//窗口大小
+                , shade: 0.3//显示透明罩效果
+                , maxmin: true
+                , btnAlign: 'c'//按钮位置居中
+                , content: data
+                , zIndex: 999 //重点1：层级      
+                , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                	$("#resetStrategy").click();	
+                }                 
+            });
+        }, "HTML");
+    }
+
+    window.bizCode='${bizCode}';
+    CKEDITOR.replace('details', {
+        //替换默认图片上传路径
+        filebrowserImageUploadUrl: '/admin/file/ckeditorUploadImg.do?bizCode=${bizCode}'
+    });
+    //ckeditor富文本编辑器内容需要更新后才可以和表单一起提交
+    function updateContent() {
+        for(instance in CKEDITOR.instances){
+            CKEDITOR.instances[instance].updateElement();
+        }
+    }	
+</script>
+<title>编辑 渠道商品信息</title>
+</head>
+<body>
+	<blockquote class="layui-elem-quote layui-text">
+		<h2>商品：${channelProduct.productName!''}详情</h2>
+	</blockquote>
+
+	<fieldset class="layui-elem-field layui-field-title">
+		<legend>商品：${channelProduct.productName!''}公共信息</legend>
+	</fieldset>
+	<div style="margin: 30px;">
+		<div class="layui-form-item" style="height: 15px;">
+			<div class="layui-inline" style="width: 220px;">
+				<b>类目：</b>${product.categoryName!''}
+			</div>
+			<div class="layui-input-inline" style="width: 220px;">
+				<b>编码：</b>${product.productCode!''}
+			</div>
+			<div class="layui-inline" style="width: 220px;">
+				<b>品牌：</b>${product.brand!''}
+			</div>
+			<div class="layui-input-inline" style="width: 220px;">
+				<b>型号/系列：</b>${product.series!''}
+			</div>
+		</div>
+		<div class="layui-form-item" style="height: 15px;">
+			<div class="layui-inline" style="width: 220px;">
+				<b>商品类型：</b>${product.productTypeStr!''}
+			</div>		
+			<div class="layui-inline" style="width: 220px;">
+				<b>状态：</b>${product.statusStr!''}
+			</div>
+			<div class="layui-input-inline" style="width: 220px;">
+				<b>计量单位：</b>${product.unit!''}
+			</div>
+			<div class="layui-inline" style="width: 220px;">
+				<b>库存：</b>${product.productCount!''}
+			</div>
+		</div>
+	</div>
+
+	<fieldset class="layui-elem-field layui-field-title">
+		<legend>
+			渠道商品信息&nbsp;&nbsp;<a class="layui-btn layui-btn-small" lay-submit lay-filter="save">保存</a>
+		</legend>
+	</fieldset>
+	<div style="margin: 30px;">
+		<!-- <div class="layui-form-item">
+			<label class="layui-form-label">标签</label>
+			<div class="layui-input-block">
+				<select class="js-productTag" style="width:800px" multiple="multiple" name="tags">
+					<#if lstProductTag?? && lstProductTag?size != 0>
+	                    <#list lstProductTag as tag>
+	                    	<option value="${tag.id!''}" selected>${tag.tag!''}</option>
+	                    </#list>
+	                </#if>						
+				</select> 
+			</div>
+		</div> -->	
+		<form class="layui-form" id="mainForm" action="">
+			<input type="hidden" name="id" value="${channelProduct.id!''}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">编码</label>
+				<div class="layui-input-block">
+					<input type="text" name="channelProductCode" value="${channelProduct.channelProductCode!''}" required lay-verify="required" readonly="readonly" autocomplete="off" class="layui-input" >
+				</div>
+			</div>
+			<!-- <div class="layui-form-item">
+				<label class="layui-form-label">专有编码</label>
+				<div class="layui-input-block">
+					<input type="text" name="specificProductCode" value="${channelProduct.specificProductCode!''}" required lay-verify="required" autocomplete="off" class="layui-input" >
+				</div>
+			</div> -->			
+			<div class="layui-form-item">
+				<label class="layui-form-label">商品标题</label>
+				<div class="layui-input-block">
+					<input type="text" name="productTitle" value="${channelProduct.productTitle!''}" required lay-verify="required" placeholder="请输入商品标题" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+	        <div class="layui-form-item">
+	            <label class="layui-form-label">上架时间</label>
+	            <div class="layui-input-block">
+	            <#if channelProduct.gmtOnSell??>
+	                <input id="gmtOnSell" type="text" name="onSell" value="${channelProduct.gmtOnSell?string('yyyy-MM-dd HH:mm:ss') }" autocomplete="off" class="layui-input">
+                <#else>
+                    <input id="gmtOnSell" type="text" name="onSell" placeholder="请输入上架时间" autocomplete="off" class="layui-input">
+                </#if>	            
+	            </div>
+	        </div>
+	        <div class="layui-form-item">
+	            <label class="layui-form-label">下架时间</label>
+	            <div class="layui-input-block">
+	            <#if channelProduct.gmtOffSell??>
+	                <input id="gmtOffSell" type="text" name="offSell" value="${channelProduct.gmtOffSell?string('yyyy-MM-dd HH:mm:ss') }" autocomplete="off" class="layui-input">
+                <#else>
+                    <input id="gmtOffSell" type="text" name="offSell" placeholder="请输入下架时间" autocomplete="off" class="layui-input">
+                </#if>	            
+	            </div>
+	        </div>        			
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">商品详情</label>
+				<input type="hidden" name="detailsId" value="${channelProductDetails.id!''}">
+				<div class="layui-input-block">
+					<textarea class="ckeditor" name="details" cols="20" rows="2" lay-verify="details" id="details" placeholder="请输入商品详情">
+					${channelProductDetails.details!''}             
+                	</textarea>
+				</div>				
+			</div>
+		</form>
+	</div>
+	<fieldset class="layui-elem-field layui-field-title">
+		<legend>
+			销售信息<!-- &nbsp;&nbsp;<a class="layui-btn layui-btn-small" lay-event="saveA">保存</a> -->
+		</legend>
+	</fieldset>
+	<div style="margin: 30px;">
+		<table class="layui-table" lay-filter="tblMain">
+			<thead>
+				<tr>
+					<th lay-data="{checkbox:true, fixed: true}"></th>
+					<th lay-data="{field:'channelGoodsCode', width:160}">渠道单品编码</th>
+					<th lay-data="{field:'specificGoodsCode', width:160, edit:'text'}">专有编码</th>
+					<th lay-data="{field:'goodsCount', width:100}">可用库存</th>
+					<#if lstAttributeKey?? && lstAttributeKey?size !=0> <#list lstAttributeKey as attributeKey>
+					<th lay-data="{field:'attr_${attributeKey.attributeKeyCode!''}', width:100}">${attributeKey.attributeKeyName!''}</th>
+					</#list> </#if>
+					<th lay-data="{field:'price', width:100, edit:'text'}">销售价</th>
+					<th lay-data="{field:'amount', width:100, edit:'text'}">分配数量</th>
+					<th lay-data="{field:'logo', width:100}">Logo</th>
+					<th lay-data="{fixed: 'right', width:300, align:'center', toolbar: '#barMain'}">操作</th>
+				</tr>
+			</thead>
+		</table>
+		<script type="text/html" id="barMain">
+      		{{#  if(d.id){ }}
+			<a class="layui-btn layui-btn-mini" lay-event="save">确认</a>
+			<a class="layui-btn layui-btn-primary layui-btn-mini" lay-event="tag">标签</a>
+			<a class="layui-btn layui-btn-normal layui-btn-mini" lay-event="uploadLogo">LOGO上传</a>
+			<a class="layui-btn layui-btn-warn layui-btn-mini" lay-event="strategy">策略</a>
+			<a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+      		{{#  } }}		
+      		{{#  if(!d.id){ }}
+			<a class="layui-btn layui-btn-mini" lay-event="save">关联</a>
+        	<a class="layui-btn layui-btn-disabled layui-btn-mini" lay-event="tag">标签</a>
+			<a class="layui-btn layui-btn-disabled layui-btn-mini" lay-event="strategy">策略</a>  
+			<a class="layui-btn layui-btn-disabled layui-btn-mini" lay-event="del">删除</a>
+      		{{#  } }}								
+		</script>	
+	</div>
+</body>
+</html>

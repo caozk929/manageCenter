@@ -1,0 +1,158 @@
+@charset "utf-8";
+@import url(../layui/css/layui.css);
+/* 布局 */
+.site-inline{font-size: 0;}
+.site-tree, .site-content{display: inline-block;  *display:inline; *zoom:1; vertical-align: top; font-size: 14px;}
+.site-tree{width: 220px; min-height: 900px; padding: 5px 0 20px;}
+.site-content{width: 899px; min-height: 900px; padding: 20px 0 10px 20px;}
+
+/* 头部 */
+.layui-layout-admin .header{height: 55px; border-bottom: 5px solid #5FB878;  background-color: #393D49; color: #fff;}
+
+.header-demo .layui-nav .layui-this:after, .header-demo .layui-nav-bar {
+    background-color: #393D49;
+}
+
+.layui-layout-admin .layui-side{
+    top: 60px;
+}
+
+/*iframe内样式*/
+
+.x-body{
+    padding: 20px;
+}
+.x-nav{
+    padding: 0 20px;
+    position: relative;
+    z-index: 99;
+    border-bottom: 1px solid #e5e5e5;
+    line-height: 39px;
+    height: 39px;
+    overflow: hidden;
+}
+.x-center{
+    text-align: center;
+    margin: 0 auto;
+}
+
+.x-right{
+    float: right;
+}
+.x-red{
+    color: red;
+}
+
+/*登录页面相关样式*/
+
+.x-box{
+    width: 400px;
+    height: 450px;
+    background: #F2F2F2 0 0 no-repeat;
+    border-radius: 20px;
+    margin: 160px auto;
+    overflow: hidden;
+}
+.x-top{
+    height: 60px;
+    width: 100%;
+    position: relative;
+}
+.x-mid{
+    position: relative;
+    height: 390px;
+    width: 100%;
+    background: #fff 0 0 no-repeat;
+}
+#loginbtn{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    border: none;
+    font-size: 30px;
+    color: #fff;
+    line-height: 70px;
+    margin: 0;
+}
+#loginbtn .layui-btn{
+    width: 100%;
+    height: 100%;
+    font-size: 30px;
+    background: #5FB878;
+}
+.x-footer button:hover{
+    background-color: #FF2775;
+    cursor: pointer;
+}
+.x-login-close{
+    font-size: 24px;
+    line-height: 60px;
+    margin-left: 20px;
+    float: left;
+    color: #393D49;
+    cursor: pointer;
+}
+.x-login-right{
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin-top: -10px;
+}
+.x-login-right li{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+    float: left;
+    cursor: pointer;
+}
+.x-avtar{
+    width: 100%;
+    height: 115px;
+    text-align: center;
+    /*background: red url() 0 0 no-repeat;*/
+}
+.x-avtar img{
+    width: 70px;
+    height: 70px;
+    border: 5px solid #5FB878;
+    border-radius: 50%;
+    margin-top: 20px;
+}
+.x-slide_left{
+    width: 17px;
+    height: 61px;
+    position: absolute;
+    top: 200px;
+    left: 0;
+    cursor: pointer;
+}
+/*.x-slide_left:hover{
+  background-position: -21px 0px;
+}*/
+
+input[type="text"]:disabled { background-color: #F2F2F2; }
+.input{
+    padding-top: 40px;
+}
+.layui-form .x-login-box{
+    width: 370px;
+    height: 50px;
+    margin-left: 15px;
+    border-bottom: 1px solid #F2F2F2;
+}
+.x-login-box .layui-form-label{
+    width: 30px;
+}
+.x-login-box i{
+    font-size: 28px;
+}
+.x-login-box input{
+    border: 0 solid #000;
+    outline: 0;
+    font-size: 28px;
+}
+
+
+

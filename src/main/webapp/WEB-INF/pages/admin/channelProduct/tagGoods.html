@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+	layui.use('form', function(){
+		  var form = layui.form;		  
+	        form.on('submit(saveGoodsTag)', function(data) {
+	            var url = "${path}/admin/channelProduct/setTagGoods.do";
+	            $.post(url, $("#tagForm").serialize(), function(data){
+	                if (data.status == "00000") {//提示成功后重新加载数据
+	                    layer.msg(data.msg);
+	                    setTimeout(function(){
+	                    	location.reload(); 
+	                        return true;
+	                    }, 500);
+	                } else {
+	                    layer.alert(data.msg);
+	                }
+	            }, "JSON");
+	            return false;//出错则不关闭窗口
+	        });		
+	});
+</script>
+
+<title>配置单品标签</title>
+</head>
+<body>
+    <div class="r-content r-btn-area">
+        <blockquote class="site-text layui-elem-quote">  
+        <form action="" id="tagForm">     
+			<select class="js-multiple" style="width:500px" multiple="multiple" name="tags">
+				<#if lstTag?? && lstTag?size != 0>
+                    <#list lstTag as tag>
+                    	<option value="${tag.id!''}" selected>${tag.tagName!''}</option>
+                    </#list>
+                </#if>						
+			</select> 
+			<input type="hidden" name="id" value="${channelGoods.id!''}">   
+			<input type="hidden" name="bizCode" value="${bizCode!''}06">    
+            <button lay-submit lay-filter="saveGoodsTag" class="layui-btn"><i class="layui-icon">&#xe608;</i>确认</button>
+        </form>
+        </blockquote>
+    </div>
+</body>
+</html>

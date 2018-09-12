@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/修改 菜单</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+</head>
+<body>
+    <div style="margin: 20px;">
+        <form id="menuForm" class="layui-form" action="" method="post">
+            <!-- 名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>名称</label>
+                <div class="layui-input-block">
+                    <#if menu??>
+                        <input type="text" name="name" value="${menu.name!'' }" maxlength="30" required lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="name" maxlength="30" required lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!-- 编码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>编码</label>
+                <div class="layui-input-block">
+                    <#if menu??>
+                        <input type="text" name="code" maxlength="7" value="${menu.code!'' }" required lay-verify="required" placeholder="请输入编码" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="code" maxlength="7" required lay-verify="required" placeholder="请输入编码" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!-- 状态-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>状态</label>
+                <div class="layui-input-block">
+                    <#if menu?? && menu.status == 0>
+                        <input type="radio" name="status" required  lay-verify="required" value="1" title="启用">
+                        <input type="radio" name="status" required  lay-verify="required" value="0" title="停用" checked>
+                    <#else>
+                        <input type="radio" name="status" required  lay-verify="required" value="1" title="启用" checked>
+                        <input type="radio" name="status" required  lay-verify="required" value="0" title="停用">
+                    </#if>
+                </div>
+            </div>
+            <!-- 上级菜单{使用分组实现}-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">上级菜单</label>
+                <div class="layui-input-block">
+                    <select name="parentId">
+                        <#if addChildren??><!--添加下级只显示一个就可以-->
+                            <option selected value="${addChildren.id!'' }">${addChildren.name!'' }</option>
+                        <#else><!--添加菜单-->
+                            <option value="0">--请选择--</option><!--一级菜单的parentId为0-->
+                            <#if menus?? && menus?size != 0>
+                                <#list menus as m>
+                                    <optgroup label="${m.name!'' }(模块)">
+                                        <#if menu?? && m.id = menu.parentId><!--修改判断勾选-->
+                                            <option selected value="${m.id!'' }">${m.name!'' }(一级)</option>
+                                        <#else>
+                                            <#if menu?? && m.id = menu.id><!--不可以选择自己-->
+                                                <option disabled value="${m.id!'' }">${m.name!'' }(一级)</option>
+                                            <#else>
+                                                <option value="${m.id!'' }">${m.name!'' }(一级)</option>
+                                            </#if>
+                                        </#if>
+                                        <#if m.children?? && m.children?size != 0>
+                                            <#list m.children as child>
+                                                <#if menu?? && child.id = menu.parentId><!--修改判断勾选-->
+                                                    <option selected value="${child.id!'' }">${child.name!'' }(二级)</option>
+                                                <#else>
+                                                    <#if menu?? && child.id = menu.id><!--不可以选择自己-->
+                                                        <option disabled value="${child.id!'' }">${child.name!'' }(二级)</option>
+                                                    <#else>
+                                                        <option value="${child.id!'' }">${child.name!'' }(二级)</option>
+                                                    </#if>
+                                                </#if>
+                                            </#list>
+                                        </#if>
+                                    </optgroup>
+                                </#list>
+                            </#if>
+                        </#if>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 序号-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>序号</label>
+                <div class="layui-input-block">
+                    <#if menu??>
+                        <input type="text" name="sort" maxlength="11" value="${menu.sort!''}" required lay-verify="required" placeholder="请输入序号,数值小的排前面(序号必须大于0)" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="sort" maxlength="11" required lay-verify="required" placeholder="请输入序号,数值小的排前面(序号必须大于0)" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!-- 路径-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">路径</label>
+                <div class="layui-input-block">
+                    <#if menu??>
+                        <input type="text" name="path" maxlength="128" value="${menu.path!'' }" placeholder="请输入路径,一级菜单可以不填写" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="path" maxlength="128" placeholder="请输入路径,一级菜单可以不填写" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div style="width: 80%; margin: 0 auto; text-align: center;">
+                    <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+                </div>
+            </div>
+            <#if menu??>
+                <input id="menuId" type="hidden" name="id" value="${menu.id!'' }"/>
+            </#if>
+        </form>
+    </div>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode!'' }">
+    </#if>
+</body>
+<script src="/resource/layui/layui.all.js"></script>
+<script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+    var bizCode = $('#bizCode').val();
+    var result = true;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                result = false;
+                var url = layui.globalConfig.adminUrl + "menu/saveOrUpdate.do?bizCode=";
+                var $id = $('#menuId').val();
+                if ($id) {//编辑
+                    url += bizCode + "03";
+                } else {//新增
+                    url += bizCode + "02";
+                }
+                $.post(url, $("#menuForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.href = "/admin/menu/v_list.do?bizCode=" + bizCode;
+                            return true;
+                        }, 2000);
+                    } else {
+                        result = true;
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            }
+        });
+    });
+</script>
+</html>

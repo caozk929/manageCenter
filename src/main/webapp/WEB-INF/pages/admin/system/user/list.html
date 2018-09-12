@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-btn-area{margin-top: 10px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-content .r-center th{text-align: center;}
+        td:nth-last-child(1){text-align: center;}
+        .r-search{margin: 10px 20px 0;}
+    </style>
+</head>
+<body>
+    <!-- 搜索区域-->
+    <div class="layui-collapse r-search">
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title">搜索</h2>
+            <div class="layui-colla-content layui-show">
+                <form id="userSearchForm" action="/admin/user/v_list.do?bizCode=${bizCode!'' }&pageNum=1" method="post">
+                    <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                        <label class="layui-form-label" style="width: 70px;">用户名称</label>
+                        <div class="layui-input-block" style="margin-left: 110px;">
+                            <#if user?? && user.username??>
+                                <input type="text" name="username" value="${user.username!'' }" placeholder="请输入用户名称" autocomplete="off" class="layui-input">
+                            <#else>
+                                <input type="text" name="username" placeholder="请输入用户名称" autocomplete="off" class="layui-input">
+                            </#if>
+                        </div>
+                    </div>
+                    <button style="margin-top: -3px;" class="layui-btn">搜索</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- -->
+    <div class="r-content r-btn-area">
+        <!-- 按钮区域 -->
+        <blockquote class="site-text layui-elem-quote">
+            <@p.permission bizCode='${bizCode }02'>
+                <button data-id="" data-method="saveOrUpdate" class="layui-btn save"><i class="layui-icon">&#xe608;</i> 新增用户</button>
+            </@p.permission>
+        </blockquote>
+    </div>
+    <!-- 内容区域-->
+    <div id="r-content" class="r-content">
+        <table lay-even style="margin:0;" class="layui-table">
+            <colgroup>
+                <col width="200">
+                <col width="200">
+                <col width="200">
+                <col width="200">
+                <col>
+                <col width="200">
+            </colgroup>
+            <thead>
+                <tr class="r-center">
+                    <th>昵称</th>
+                    <th>用户名称</th>
+                    <th>渠道</th>
+                    <th>手机号码</th>
+                    <th>电子邮箱</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#if pageInfo.list?? && pageInfo.list?size != 0>
+                    <#list pageInfo.list as user>
+                        <tr>
+                            <td>${user.nickName!'' }</td>
+                            <td>${user.username!'' }</td>
+                            <td>${user.channelName!'' }</td>
+                            <td>${user.mobile!'' }</td>
+                            <td>${user.email!'' }</td>
+                            <td>
+                                <@p.permission bizCode='${bizCode }03'>
+                                    <bottom data-id="${user.id!'' }" data-method="saveOrUpdate" class="layui-btn layui-btn-mini layui-btn-normal">编辑</bottom>
+                                </@p.permission>
+                                <@p.permission bizCode='${bizCode }04'>
+                                    <bottom data-id="${user.id!'' }" data-method="deleteById" class="layui-btn layui-btn-mini layui-btn-danger">删除</bottom>
+                                </@p.permission>
+                                <@p.permission bizCode='${bizCode }05'>
+                                     <bottom data-id="${user.id!'' }" data-method="resetPassWord" class="layui-btn layui-btn-mini layui-btn-warn">重置密码</bottom>
+                                </@p.permission>
+                            </td>
+                        </tr>
+                    </#list>
+                </#if>
+            </tbody>
+        </table>
+        <!-- 分页容器-->
+        <div id="page" style="text-align: right;"></div>
+        <#if bizCode??>
+            <input type="hidden" id="bizCode" value="${bizCode!'' }">
+        </#if>
+    </div>
+</body>
+
+<!-- js方法，分页，搜索时候部分参数需要重新赋值-->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--搜索区域JS-->
+<script>
+    layui.use(['element'], function() {
+        var element = layui.element;
+    });
+</script>
+<!-- 分页JS-->
+<script>
+    var bizCode = $('#bizCode').val();
+    layui.use(['laypage'], function() {
+        var $ = layui.jquery, laypage = layui.laypage;
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'page', //注意，这里的 test1 是 ID，不用加 # 号
+            curr: Number('${pageInfo.pageNum }'),//当前页码需要在服务器端拿到
+            layout: ['count', 'prev', 'page', 'next', 'skip'],//自定义
+            limit: Number('${pageInfo.pageSize }'),//每页显示条数
+            groups: 10,//连续出现的页码数量
+            count: Number('${pageInfo.total }'), //数据总数，从服务端得到
+            jump: function(obj) {//点击分页按钮的回调函数
+                //异步加载数据
+                if (Number('${pageInfo.pageNum }') > 0 && Number('${pageInfo.pageNum }') != obj.curr) {
+                    var url = "/admin/user/v_list.do?bizCode=" + bizCode + "&pageNum=" + obj.curr;
+                    $('#userSearchForm').attr('action', url);
+                    $('#userSearchForm').submit();
+                }
+            }
+        });
+    });
+</script>
+<!-- 按钮赋值等js-->
+<script>
+    layui.use(['layer'], function() {
+        var $ = layui.jquery, layer = layui.layer;
+        var active = {
+            saveOrUpdate: function () {//新增修改方法
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                var url = "/admin/user/v_saveOrUpdate.do?bizCode=";
+                if ($id != null && $id != "") {//编辑
+                    url += bizCode + "03";
+                } else {//新增
+                    url += bizCode + "02";
+                }
+                //异步请求返回页面
+                $.post(url, {"id": $id}, function (data) {
+                    layer.open({
+                        type: 1 //返回html类型
+                        , title: '新增/编辑 用户'
+                        , area: ['700px', '500px']//窗口大小
+                        , shade: 0.3//显示透明罩效果
+                        , maxmin: true
+                        , btnAlign: 'c'//按钮位置居中
+                        , btn: [] //按钮
+                        , content: data
+                        , zIndex: 999 //重点1：层级
+                        , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                            layer.setTop(layero); //重点2
+                        }
+                    });
+                }, "HTML");
+            },
+            deleteById: function() {
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定删除用户吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function () {//确定
+                        //异步删除
+                        $.ajax({
+                            url: "/admin/user/delete.do?bizCode=" + bizCode + "04",
+                            type: "POST",
+                            data: {"id": $id},
+                            dataType: "JSON",
+                            success: function (data) {
+                                layer.msg(data.msg);
+                                if (data.status == "00000") {
+                                    setTimeout(function () {
+                                        location.href = "/admin/user/v_list.do?bizCode=" + bizCode;
+                                    }, 2000);
+                                }
+                            }
+                        });
+                    },
+                    btn2: function () {//取消
+                        layer.closeAll();
+                    }
+                });
+            },
+            resetPassWord: function() {//重置密码方法
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定重置密码吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function () {//确定
+                        //异步重置密码
+                        $.ajax({
+                            url: "/admin/user/o_resetPassWord.do?bizCode=" + bizCode + "05",
+                            type: "POST",
+                            data: {"id": $id},
+                            dataType: "JSON",
+                            success: function (data) {
+                                if (data.status == "00000") {
+                                    layer.msg(data.msg);
+                                    setTimeout(function () {
+                                        location.href = "/admin/user/v_list.do?bizCode=" + bizCode;
+                                    }, 2000);
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    },
+                    btn2: function () {//取消
+                        layer.closeAll();
+                    }
+                });
+            }
+        }
+        //为按钮注入事件
+        $('.layui-btn, .layui-btn-normal, .layui-btn-danger').on('click', function() {
+            var $othis = $(this), $method = $othis.data('method');
+            active[$method] ? active[$method].call(this, $othis) : '';
+        });
+    });
+</script>
+</html>

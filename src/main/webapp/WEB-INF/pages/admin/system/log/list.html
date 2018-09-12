@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>广告图片信息管理</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content {
+            padding: 0 20px;
+        }
+
+        .r-content div {
+            margin: 0;
+        }
+
+        .r-btn-area blockquote {
+            margin-bottom: 0;
+            border-right: 1px solid #e2e2e2;
+            border-top: 1px solid #e2e2e2;
+            padding: 5px;
+        }
+
+        .r-search {
+            margin: 10px 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .block {
+            display: inline-block;
+        }
+    </style>
+</head>
+‘
+<body>
+
+<!-- 搜索区域-->
+<div class="layui-collapse r-search">
+    <div class="layui-colla-item">
+        <h2 class="layui-colla-title">搜索</h2>
+        <div class="layui-colla-content layui-show">
+            <form id="logSearchForm" action="/admin/log/v_list.do?bizCode=m0104" method="post">
+                <!--后台日志查询条件 -->
+                <div class="layui-form-item block" id="username" style=" margin-bottom: 0;">
+                    <label class="layui-form-label " style=" width: 70px;">用户名称:</label>
+                    <div class="layui-input-block" style="margin-left: 100px;">
+                        <input type="text" style="width: 150px;" name="username" value="${log.username!'' }"
+                               placeholder="请输入用户名称"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="layui-form-item block" id="businessCode" style="margin-bottom: 0">
+                    <label class="layui-form-label" style="width: 70px;">业务编码:</label>
+                    <div class="layui-input-block" style="margin-left: 100px;">
+                        <input type="text" style="width: 150px;" name="businessCode" value="${log.businessCode!'' }"
+                               placeholder="请输入业务编码"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <!--接口日志查询条件 -->
+                <div class="layui-form-item hidden" id="channelName" style="margin-bottom: 0;">
+                    <label class="layui-form-label" style="width: 60px;">渠道名称:</label>
+                    <div class="layui-input-block" style="margin-left: 100px;">
+                        <input type="text" style="width: 150px;" name="channelName" value="${log.channelName!'' }"
+                               placeholder="请输入渠道名称"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="layui-form-item hidden" id="serviceName" style=" margin-bottom: 0">
+                    <label class="layui-form-label" style="width: 70px;">接口名称:</label>
+                    <div class="layui-input-block" style="margin-left: 100px;">
+                        <input type="text" style="width: 150px;" name="serviceName" value="${log.serviceName!'' }"
+                               placeholder="请输入接口名称"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <!--通用查询条件 -->
+                &nbsp;&nbsp;&nbsp;
+                <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                    <label class="layui-form-label" style="width: 70px;">日志内容:</label>
+                    <div class="layui-input-block" style="margin-left: 100px;">
+                        <input style="width: 180px;" type="text" name="content" value="${log.content!'' }"
+                               placeholder="请输入日志内容"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <br><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>创建时间:&nbsp;&nbsp;</label>
+                <div class="layui-inline">
+                    <#if  log.createTimeBegin??>
+                        <input type="text" class="layui-input test-item" name="createTimeBegin"
+                               value="${log.createTimeBegin!''}">
+                        <#else>
+                            <input type="text" class="layui-input test-item" name="createTimeBegin" placeholder="请选择">
+                    </#if>
+                </div>
+                &nbsp;--&nbsp;&nbsp;
+                <div class="layui-inline">
+                    <#if  log.createTimeEnd??>
+                        <input type="text" class="layui-input test-item" name="createTimeEnd"
+                               value="${log.createTimeEnd!''}">
+                        <#else>
+                            <input type="text" class="layui-input test-item" name="createTimeEnd" placeholder="请选择">
+                    </#if>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                日志类型:&nbsp;&nbsp;
+                <div class="layui-inline">
+                    <select name="type" class="layui-input" style="width: 220px;" lay-verify="required"
+                            lay-search="" onchange="checkField(this.options[this.options.selectedIndex].value)">
+                        <#if  log?? && log.type?? >
+                            <option value="1"
+                            <#if (log.type==1)>selected=selected</#if>
+                            >后台日志</option>
+                            <option value="2"
+                            <#if (log.type==2)>selected=selected!</#if>
+                            >接口日志</option>
+                            <#else>
+                                <option value="1">后台日志</option>
+                                <option value="2">接口日志</option>
+                        </#if>
+                    </select>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <button style="margin-top: -3px;" class="layui-btn ">搜索</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- 内容区域-->
+<div id="r-content" class="r-content">
+    <!-- 分页容器-->
+    <table id="page" lay-filter="tableFilter"></table>
+</div>
+</body>
+
+<!--------------------------------- JS ---------------------------------------->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--搜索区域JS-->
+<script>
+    layui.use(['element'], function () {
+        var element = layui.element;
+    });
+</script>
+<script>
+    function getType(data) {
+        var type = data.type;
+        switch (type) {
+            case 1 :
+                return "后台日志";
+            case 2 :
+                return "接口日志";
+        }
+    }
+
+    function getName(data) {
+        var type = data.type;
+        switch (type) {
+            case 1 :
+                return data.username;
+            case 2 :
+                return data.channelName;
+        }
+    }
+
+    function getCode(data) {
+        var type = data.type;
+        switch (type) {
+            case 1 :
+                return data.businessCode;
+            case 2 :
+                return data.serviceName;
+        }
+    }
+</script>
+<!-- 分页JS-->
+<script>
+    function checkField(data) {
+        var type = data; //得到被选中的值
+        if (type == 1) {
+            $("#channelName").removeClass("block").addClass("hidden");
+            $("#serviceName").removeClass("block").addClass("hidden");
+            $("#username").removeClass("hidden").addClass("block");
+            $("#businessCode").removeClass("hidden").addClass("block");
+        } else if (type == 2) {
+            $("#username").removeClass("block").addClass("hidden");
+            $("#businessCode").removeClass("block").addClass("hidden");
+            $("#channelName").removeClass("hidden").addClass("block");
+            $("#serviceName").removeClass("hidden").addClass("block");
+
+        }
+
+    };
+
+    <#if log?? && log.type?? &&log.type==2>
+    $("#username").removeClass("block").addClass("hidden");
+    $("#businessCode").removeClass("block").addClass("hidden");
+    $("#channelName").removeClass("hidden").addClass("block");
+    $("#serviceName").removeClass("hidden").addClass("block");
+    </#if>
+
+    layui.use(['table', 'form', 'laydate'], function () {
+        var table = layui.table;
+        var laydate = layui.laydate;
+
+        //执行渲染
+        table.render({
+            id: 'dataTable',
+            elem: '#page', //指定原始表格元素选择器（推荐id选择器）
+            page: true,
+            even: true,
+            cols: [[ //标题栏
+                {checkbox: true, width: 140, fixed: true}
+                , {field: 'username', title: '用户/渠道名称', dataDeal: 'getName', width: 130}
+                , {field: 'businessCode', title: '业务编码/接口名称', dataDeal: 'getCode', width: 150}
+                , {field: 'type', title: '日志类型', dataDeal: 'getType', width: 150}
+                , {field: 'content', title: '日志内容', width: 600}
+                , {field: 'createTime', title: '创建时间', sort: true, width: 200}
+            ]],
+            url: '/admin/log/o_list.json',
+            method: 'POST',
+            where: {
+                bizCode: '${bizCode}' + '01',
+                username: "${log.username!''}",
+                createTimeBegin: "${log.createTimeBegin!''}",
+                createTimeEnd: "${log.createTimeEnd!''}",
+                businessCode: "${log.businessCode!''}",
+                content: "${log.content!''}",
+                type: "${log.type!'1'}",
+                channelName: "${log.channelName!''}",
+                serviceName: "${log.serviceName!''}"
+            },
+            limits: [1, 10, 20, 30, 50, 100],
+            limit: 20,
+            request: {
+                pageName: 'pageNum', //页码的参数名称，默认：page
+                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+            },
+            response: {
+                statusName: 'status',
+                statusCode: '00000', //成功的状态码，默认：0
+                msgName: 'msg', //状态信息的字段名称，默认：msg
+                countName: 'count', //数据总数的字段名称，默认：count
+                dataName: 'data'
+
+            },
+
+        });
+
+        lay('.test-item').each(function () {
+            laydate.render({
+                elem: this
+                , trigger: 'click'
+            });
+        });
+
+
+    });
+</script>
+</html>

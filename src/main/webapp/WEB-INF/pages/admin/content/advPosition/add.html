@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增位置信息</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <script src="/resource/layui/layui.all.js"></script>
+    <script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+    <script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<div style="margin: 20px;">
+    <form id="menuForm" class="layui-form" action="" method="post">
+        <!-- 名称-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                名称</label>
+            <div class="layui-input-block">
+                        <input type="text" name="name" maxlength="30" required lay-verify="required" placeholder="请输入名称"
+                               autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <!-- 位置编码-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                编码</label>
+            <div class="layui-input-block">
+                        <input type="text" name="positionCode" maxlength="7" required lay-verify="required"
+                               placeholder="请输入编码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <!-- 状态-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                状态</label>
+            <div class="layui-input-block">
+                        <input type="radio" name="status" required lay-verify="required" value="1" title="启用" checked>
+                        <input type="radio" name="status" required lay-verify="required" value="0" title="停用">
+            </div>
+        </div>
+        <!-- 渠道-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                渠道</label>
+            <div class="layui-input-block">
+                <select name="channel" class="layui-input" lay-verify="required" lay-search="">
+                    <option value="">请选择</option>
+                    <
+                    <#if channelMap?? && channelMap?size gt 0>
+                        <#list channelMap?keys as key>
+                            <option value="${key}"
+                            >${(channelMap['${key}'])!""}</option>
+                        </#list>
+                    </#if>
+                </select>
+            </div>
+        </div>
+
+        <!-- 备注-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="remarks" class="layui-textarea" placeholder="请输入备注......"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+<script src="/resource/layui/layui.all.js"></script>
+<script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+    var bizCode = '${bizCode}';
+    if(bizCode){
+        bizCode = bizCode.substring(0,5);
+    }
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        var result = false;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                return;
+            }
+            result = true;
+            var url = "/admin/content/advPosition/o_add.do?bizCode="+bizCode+"02";
+            $.post(url, $("#menuForm").serialize(), function(data) {
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg("修改成功");
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layui.table.reload("dataTable");
+                    parent.layer.close(index);
+                } else {
+                    result = false;
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+    });
+</script>
+</html>

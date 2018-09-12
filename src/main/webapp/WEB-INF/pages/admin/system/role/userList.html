@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>角色所属用户</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-content .r-center th{text-align: center;}
+        td:nth-last-child(1){text-align: center;}
+    </style>
+</head>
+<body>
+
+<!-- 内容区域-->
+<div id="r-content" class="r-content" style="margin-top:20px">
+    <table lay-even style="margin:0;" class="layui-table">
+        <colgroup>
+            <col width="200">
+            <col width="200">
+            <col width="200">
+            <col width="200">
+            <col width="200">
+            <col>
+        </colgroup>
+        <thead>
+        <td colspan="5"  style="font:20px bolder ; text-align:center;color:red">
+            角色名：${role.name!'' }
+        </td>
+        <tr class="r-center">
+            <th>昵称</th>
+            <th>用户名称</th>
+            <th>手机号码</th>
+            <th>电子邮箱</th>
+            <th>创建时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <#if pageInfo.list?? && pageInfo.list?size != 0>
+            <#list pageInfo.list as user>
+                <tr>
+                    <td>${user.nickName!'' }</td>
+                    <td>${user.username!'' }</td>
+                    <td>${user.mobile!'' }</td>
+                    <td>${user.email!'' }</td>
+                    <td>${(user.createTime?string('yyyy-MM-dd HH:mm:ss'))!'' }</td>
+                </tr>
+            </#list>
+        </#if>
+        </tbody>
+    </table>
+    <!-- 分页容器-->
+    <div id="page" style="text-align: right;"></div>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode }">
+    </#if>
+    <#if role.id??>
+        <input type="hidden" id="id" value="${role.id }">
+    </#if>
+</div>
+
+<div display="none">
+    <form id="roleSearchForm" action="/admin/role/o_userList.do?bizCode=${bizCode }&pageNum=1" method="post">
+    </form>
+</div>
+
+</body>
+
+<!-- js方法，分页，搜索时候部分参数需要重新赋值-->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--搜索区域JS-->
+<script>
+    layui.use(['element'], function() {
+        var element = layui.element;
+    });
+</script>
+<!-- 分页JS-->
+<script>
+    var bizCode = $('#bizCode').val();
+    var id = $('#id').val();
+    layui.use(['laypage'], function() {
+        var $ = layui.jquery, laypage = layui.laypage;
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'page', //注意，这里的 test1 是 ID，不用加 # 号
+            curr: Number('${pageInfo.pageNum }'),//当前页码需要在服务器端拿到
+            layout: ['count', 'prev', 'page', 'next', 'skip'],//自定义
+            limit: Number('${pageInfo.pageSize }'),//每页显示条数
+            groups: 10,//连续出现的页码数量
+            count: Number('${pageInfo.total }'), //数据总数，从服务端得到
+            jump: function(obj) {//点击分页按钮的回调函数
+                //异步加载数据
+                if (Number('${pageInfo.pageNum }') > 0 && Number('${pageInfo.pageNum }') != obj.curr) {
+                    var url = "/admin/role/o_userList.do?bizCode=" + bizCode + "&pageNum=" + obj.curr+"&id="+id;
+                    $('#roleSearchForm').attr('action', url);
+                    $('#roleSearchForm').submit();
+                }
+            }
+        });
+    });
+</script>
+
+</html>

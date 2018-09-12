@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>广告图片位置管理</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-content div{margin: 0;}
+        .r-btn-area{margin-top: 10px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-search{margin: 10px 20px 0;}
+        .layui-form-switch{
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 搜索区域-->
+<div class="layui-collapse r-search">
+    <div class="layui-colla-item">
+        <h2 class="layui-colla-title">搜索</h2>
+        <div class="layui-colla-content layui-show">
+            <form id="advPositionSearchForm" action="/admin/content/advPosition/v_list.do?bizCode=c0102&pageNum=1"
+                  method="post">
+                <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                    <label class="layui-form-label" style="width: 35px;">名称:</label>
+                    <div class="layui-input-block" style="margin-left: 65px;">
+                        <input type="text" name="name" value="${advPosition.name!'' }" placeholder="请输入名称"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>录入时间:&nbsp;&nbsp;</label>
+                <div class="layui-inline">
+                    <#if  advPosition.beginDate??>
+                        <input type="text" class="layui-input test-item" name="beginDate"
+                               value="${advPosition.beginDate }">
+                        <#else>
+                            <input type="text" class="layui-input test-item" name="beginDate" placeholder="请选择">
+                    </#if>
+                </div>
+                &nbsp;--&nbsp;&nbsp;
+                <div class="layui-inline">
+                    <#if  advPosition.endDate??>
+                        <input type="text" class="layui-input test-item" name="endDate" value="${advPosition.endDate }">
+                        <#else>
+                            <input type="text" class="layui-input test-item" name="endDate" placeholder="请选择">
+                    </#if>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                渠道:&nbsp;&nbsp;
+                <div class="layui-inline">
+                    <select name="channel" class="layui-input" style="width: 220px;" lay-verify="required"
+                            lay-search="">
+                        <option value="">请选择</option>
+                        <
+                        <#if channelMap?? && channelMap?size gt 0>
+                            <#list channelMap?keys as key>
+                                <option value="${key}"
+                                <#if (advPosition.channel)?? && (advPosition.channel==key)>selected=selected</#if>
+                                >${(channelMap['${key}'])!""}</option>
+                            </#list>
+                        </#if>
+                    </select>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button style="margin-top: -3px;" class="layui-btn">搜索</button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- -->
+<div class="r-content r-btn-area">
+    <!-- 按钮区域 -->
+    <blockquote class="site-text layui-elem-quote">
+        <@p.permission bizCode='${bizCode}02'>
+        <button data-id="" data-method="add" class="layui-btn save"><i class="layui-icon">&#xe608;</i> 新增位置信息</button>
+        </@p.permission>
+
+        <@p.permission bizCode='${bizCode}04'>
+        <button class="layui-btn " data-method="deleteByIds"><i class="layui-icon">&#xe640;</i> 删除所选</button>
+        </@p.permission>
+</blockquote>
+</div>
+
+<!-- 内容区域-->
+<div id="r-content" class="r-content">
+    <!-- 分页容器-->
+    <table id="page" lay-filter="tableFilter"></table>
+</div>
+</body>
+
+<!--------------------------------- JS ---------------------------------------->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--搜索区域JS-->
+<script type="text/html" id="operateBar">
+    <@p.permission bizCode='${bizCode}03'>
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    </@p.permission>
+    <@p.permission bizCode='${bizCode}04'>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </@p.permission>
+</script>
+<script>
+    layui.use(['element'], function () {
+        var element = layui.element;
+    });
+</script>
+<script>
+    function getStatus(data) {
+        var status = data.status;
+        switch (status) {
+            case 1: return "<div class='layui-input-block'><input type='checkbox' value='"+data.id+"' checked='' name='open' lay-skin='switch' lay-filter='statusSwitch' lay-text='正常|停用'></div>"
+            case 0: return "<div class='layui-input-block'><input type='checkbox' value='"+data.id+"' name='off' lay-skin='switch' lay-filter='statusSwitch' lay-text='正常|停用'></div>";
+        }
+    }
+</script>
+
+<!-- 分页JS-->
+<script>
+    layui.use('form', function () {
+    });
+
+    layui.use(['jquery', 'table', 'form', 'laydate'], function () {
+        var $ = layui.jquery;
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var form = layui.form;
+        //执行渲染
+        var tableIns = table.render({
+            id: 'dataTable',
+            elem: '#page', //指定原始表格元素选择器（推荐id选择器）
+            page: true,
+            even: true,
+            cols: [[ //标题栏
+                {checkbox: true, width: 140, fixed: true}
+                , {field: 'id', title: '标识编号', sort: true, width: 150}
+                , {field: 'channelName', title: '所属渠道', width: 160}
+                , {field: 'name', title: '位置名称', edit: 'text', width: 300}
+                , {field: 'positionCode', title: '位置编码', width: 130}
+                , {field: 'status', title: '状态', dataDeal: 'getStatus', sort: true, width: 120}
+                , {field: 'createTime', title: '录入时间', sort: true, width: 180}
+                , {fixed: 'right', width: 180, align: 'center', toolbar: '#operateBar'}
+            ]],
+            url: '/admin/content/advPosition/o_list.json',
+            method: 'POST',
+            where: {
+                bizCode: '${bizCode}' + '01',
+                channel: "${advPosition.channel!''}",
+                name: "${advPosition.name!''}",
+                beginDate: "${advPosition.beginDate!''}",
+                endDate: "${advPosition.endDate!''}",
+                channel: "${advPosition.channel!''}"
+            },
+            limits: layui.globalConfig.limits,
+            limit: 20,
+            request: {
+                pageName: 'pageNum', //页码的参数名称，默认：page
+                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+            },
+            response: {
+                statusName: 'status',
+                statusCode: '00000', //成功的状态码，默认：0
+                msgName: 'msg', //状态信息的字段名称，默认：msg
+                countName: 'count', //数据总数的字段名称，默认：count
+                dataName: 'data'
+            }
+        });
+        //监听工具条
+        table.on('tool(tableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('确定删除当前行？', function (index) {
+                    $.post("/admin/content/advPosition/o_delete.do", {bizCode: '${bizCode}04', ids: data.id},
+                        function (data) {
+                            if (data.status == '00000') {
+                                layer.close(index);
+                                layer.msg("删除成功！");
+                                tableIns.reload();
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }, "json");
+                });
+            } else if (obj.event === 'edit') {
+
+                //异步请求返回页面
+                layer.open({
+                    type: 2 //返回iframe类型
+                    , title: '编辑位置信息'
+                    , area: ['700px', '500px']//窗口大小
+                    , shade: 0.3//显示透明罩效果
+                    , maxmin: true
+                    , btnAlign: 'c'//按钮位置居中
+                    , btn: [] //按钮
+                    , content: '/admin/content/advPosition/v_edit.do?bizCode=${bizCode}03&id=' + data.id
+                    , zIndex: 999 //重点1：层级
+                    , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                        layer.setTop(layero); //重点2
+                    }
+
+                });
+            }
+        });
+
+        //监听单元格编辑
+        table.on('edit(tableFilter)', function (obj) {
+            var value = obj.value  //得到修改后的值
+            var field = obj.field; //得到字段
+            var params = "bizCode=${bizCode}03" + "&id=" + obj.data.id + "&" + field + "=" + value;
+            $.post("/admin/content/advPosition/o_edit.do", params,
+                function (data) {
+                    if (data.status != '00000') {
+                        layer.msg(data.msg);
+                    }
+                }, "json");
+        });
+
+        //监听指定开关
+        form.on('switch(statusSwitch)', function(data){
+            var status = this.checked?1:0;
+            var params = "bizCode=${bizCode}03&id="+$(this).val()+"&status="+status;
+            $.post("/admin/content/advPosition/o_edit.do", params,
+                function(data){
+                    if(data.status != '00000'){
+                        layer.msg(data.msg);
+                    }
+                },"json");
+        });
+
+        //触发事件
+        var active = {
+            add: function () {//新增方法
+                var that = this;
+                //多窗口模式，层叠置顶
+                //异步请求返回页面
+                layer.open({
+                    type: 2 //返回iframe类型
+                    , title: '新增位置信息'
+                    , area: ['700px', '500px']//窗口大小
+                    , shade: 0.3//显示透明罩效果
+                    , maxmin: true
+                    , btnAlign: 'c'//按钮位置居中
+                    , content: '/admin/content/advPosition/v_add.do?bizCode=${bizCode}02'
+                    , zIndex: 999 //重点1：层级
+                    , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                        layer.setTop(layero); //重点2
+                    }
+
+                });
+            },
+            deleteByIds: function () {//批量删除方法
+                //多窗口模式，层叠置顶
+                var checkStatus = table.checkStatus('dataTable');
+                var data = checkStatus.data;
+                if (data.length == 0) {
+                    layer.alert("请选择需要删除的记录！");
+                    return;
+                }
+                //确认框
+                layer.confirm('确认删除所选?', function (index) {
+                    var ids = "";
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 0) {
+                            ids = data[i].id;
+                        } else {
+                            ids += "," + data[i].id;
+                        }
+                    }
+                    $.post("/admin/content/advPosition/o_delete.do", {bizCode: '${bizCode}04', ids: ids},
+                        function (data) {
+                            if (data.status == '00000') {
+                                layer.close(index);
+                                layer.msg("删除成功！");
+                                tableIns.reload();
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }
+                        , "json");
+                });
+            }
+
+
+        };
+        //为按钮注入事件
+        $('.layui-btn, .tabel_edit_icon, .tabel_delect_icon, .tabel_detail_icon').on('click', function () {
+            var $othis = $(this), $method = $othis.data('method');
+            active[$method] ? active[$method].call(this, $othis) : '';
+        });
+
+        lay('.test-item').each(function () {
+            laydate.render({
+                elem: this
+                , trigger: 'click'
+            });
+        })
+
+
+    });
+</script>
+
+</html>

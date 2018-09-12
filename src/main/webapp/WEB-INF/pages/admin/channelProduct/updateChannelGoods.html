@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>上传logo图片</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <script src="/resource/layui/layui.all.js"></script>
+    <script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+    <script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div style="margin: 20px;">
+    <form id="menuForm" class="layui-form" action="" method="post">
+
+        <!--logo图片地址 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <sapn style="color: red;">*</sapn>
+                图片地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="logo" maxlength="7" required lay-verify="required"
+                       readonly="true" autocomplete="off" class="layui-input" value="${channelGoods.logo!'' }">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-normal" id="test8">选择图片</button>
+                <button type="button" class="layui-btn" id="test9">开始上传</button>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;" id="Img">
+                    预览图：
+                    <div class="layui-upload-list" id="demo2"></div>
+                    <img src="${channelGoods.logo!'' }" class="layui-upload-img" id="imageId">
+                    <br>
+                    <button type="button" class="layui-btn layui-btn-normal" id="delImage">删除图片</button>
+                </blockquote>
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div style="width: 80%; margin: 0 auto; text-align: center;">
+                <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+            </div>
+        </div>
+            <input type="hidden" name="id" value="${channelGoods.id!'' }"/>
+    </form>
+</div>
+</body>
+<script src="/resource/layui/layui.all.js"></script>
+<script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+    var bizCode = '${bizCode}';
+    if(bizCode){
+        bizCode = bizCode.substring(0,5);
+    }
+    layui.use(['form', 'upload'], function() {
+        var form = layui.form, layer = layui.layer,upload = layui.upload,result = false;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                return;
+            }
+            result = true;
+            var url = "/admin/channelProduct/saveChannelGoods.do?bizCode="+bizCode+"10";
+            $.post(url, $("#menuForm").serialize(), function(data) {
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg("修改成功");
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layui.table.reload("idMain");
+                    parent.layer.close(index);
+                } else {
+                    result = false;
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+
+        upload.render({
+            elem: '#test8'
+            , url: '/admin/file/uploadFile.do'
+            , data:{'bizCode':bizCode}
+            , auto: false  //不自动上传
+            , accept: 'images' //上传文件类型！
+            , bindAction: '#test9' //指定上传按钮
+            ,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                var oldFileUrl = $("[name='logo']").val();
+                if(oldFileUrl){
+                    $("#delImage").click();
+                }
+            }
+            , done: function (res) {
+                //上传请求回调
+                if (res.respCode == "00000") {
+                    $("#imageId").attr("src", res.files[0].filePath);
+                    $("[name='logo']").val(res.files[0].filePath);
+                    $("#Img").removeClass('hidden');
+                } else {
+                    layer.alert(res.respMsg);
+                }
+
+            }
+        });
+
+        $("#delImage").click(function () {
+            var fileUrl = $("[name='logo']").val();
+            $.ajax({
+                url: '/admin/file/deleteFile.do',
+                type: "POST",
+                data: {"fileUrl": fileUrl,'bizCode':bizCode},
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status == "00000") {
+                        $("#Img").addClass('hidden');
+                        $("#imageId").attr("src", " ");
+                        $("[name='logo']").val(" ");
+                    } else {
+                        layer.alert(res.msg);
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+</html>

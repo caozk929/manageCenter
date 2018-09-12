@@ -1,0 +1,151 @@
+@charset "UTF-8";
+
+/*---------header---------*/
+.header-in{
+	background-color: #f3f3f3; 
+	width: 960px;
+	height: 96px;
+	margin: 0 auto;
+	border-top: 4px solid #dc0000;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.15),inset 0 -1px 0 0 #fcfcfc;
+    -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15),inset 0 -1px 0 0 #fcfcfc;
+    -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15),inset 0 -1px 0 0 #fcfcfc;
+}
+.header-title{
+	width: 960px; 
+	margin: 0 auto; 
+	height: 96px;
+}
+.header-title h1{
+	font-size: 24px; 
+	line-height: 96px;
+	margin-left: 20px;
+}
+/* ------------------nav------------------ */
+.nav{
+	width: 160px;
+	height: 500px;
+	position: fixed;
+	left: 10px;
+	top: 50px;
+	overflow-y: auto;
+	font-size: 12px;
+	border: 1px solid #ccc;
+}
+.nav dt{
+	padding: 4px 0 2px 5px;
+}
+.nav dd{
+	padding: 4px 0 2px 15px;
+	
+}
+/* -------------content----------------- */
+.content{
+	width: 960px;
+	margin: 20px auto 10px;
+	padding-left: 20px;
+}
+h2 a, h2 a:hover{
+	height: 50px;
+	line-height: 50px;
+	font-weight: bold;
+	font-size: 24px;
+	color: #000;
+}
+h3 a, h3 a:hover, h4{
+	height: 40px;
+	line-height: 40px;
+	font-weight: bold;
+	font-size: 20px;
+	color: #000;
+	opacity: .8;
+	padding-left: 20px;
+}
+.content h4{
+	font-weight: normal;
+	font-size: 16px;
+	color: #4a9dd9;
+}
+.content p{
+	padding-left: 20px;
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	display: table;
+}
+.terms{
+	width: 920px;
+	margin: 0 auto;
+}
+table{
+	width: 920px;
+}
+th{
+	font-size: 18px;
+	background-color: #4A9DD9;
+	color: #fff;
+	height: 30px;
+	line-height: 30px;
+}
+td{
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+}
+tr:nth-of-type(odd){
+	background-color: #E8E8E8;
+}
+tr:nth-of-type(even){
+	background-color: #F0F0F0;
+}
+table tr,td{
+	padding-left: 10px;
+}
+.terms th:nth-of-type(1){
+	width: 200px;
+}
+.terms th:nth-of-type(2){
+	width: 720px;
+}
+.param th:nth-of-type(1){
+	width: 70px;
+}
+.param th:nth-of-type(2){
+	width: 120px;
+}
+.param th:nth-of-type(3){
+	width: 120px;
+}
+.param th:nth-of-type(4){
+	width: 120px;
+}
+.param th:nth-of-type(5){
+	width: 120px;
+}
+.param th:nth-of-type(6){
+	width: 70px;
+}
+.code th:nth-of-type(1){
+	width: 120px;
+}
+.code th:nth-of-type(2){
+	width: 400px;
+}
+.red{
+	color: #ff0000;
+}
+/*-----------footer------------*/
+.footer{
+	height: 50px;
+	margin-top: 30px;
+	margin-bottom: 40px;
+}
+.footer-in{
+	width: 960px;
+	margin: 10px auto;
+	text-align: center;
+	font-size: 14px;
+	color: #4a9dd9;
+	height: 30px;
+	line-height: 30px;
+}

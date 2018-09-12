@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+	layui.use('form', function(){
+		  var form = layui.form;		  
+	        form.on('submit(strategyForm)', function(data) {
+	            var url = "${path}/admin/channelProduct/setStrategyGoods.do";
+	            $.post(url, $("#strategyForm").serialize(), function(data){
+	                if (data.status == "00000") {//提示成功后重新加载数据
+	                    layer.msg(data.msg);
+	                    setTimeout(function(){
+	                    	location.reload(); 
+	                        return true;
+	                    }, 500);
+	                } else {
+	                    layer.alert(data.msg);
+	                }
+	            }, "JSON");
+	            return false;//出错则不关闭窗口
+	        });	
+	        
+	        form.on('checkbox', function(data){
+	  		    	//var info ='<div class="layui-form-item" id="b"><div class="layui-inline"><label class="layui-form-label">多规则验证</label><div class="layui-input-inline"><input type="text" name="number" lay-verify="required|number" autocomplete="off" class="layui-input"></div></div>';
+	  		    	//var id = "#" + data.elem.name;
+	  		    	var strategyId = data.value
+	  		    	var id = "#" + strategyId;
+	  		    	if(data.elem.checked) {
+	  		    		if($(id).length > 0) {
+	  		    			return;
+	  		    		}
+						$.ajax({
+						    url: "${path}/admin/channelProduct/strategyParam.do?bizCode=${bizCode}07",
+						    type: "POST",
+						    data: {"strategyId" : strategyId, "channelGoodsCode" : "${channelGoods.channelGoodsCode!''}"},
+						    dataType: "JSON",
+						    success: function (info) {
+						        if (info.status == "00000") {
+						            //layer.msg(strategyId + "===" + info.msg);
+						            var divId = "#param_"  + strategyId;
+						            if(info.msg.length > 0) {
+						            	$(divId).after(info.msg);
+						            }
+						            //$(this).parent().after(info.msg);
+						        } else {
+						            layer.msg(info.msg);
+						        }
+						    }
+						});	  		    		
+	  		    		//$(this).parent().after(info);
+	  		    	} else {	  		    		
+	  		    		if($(id).length > 0) {
+	  		    			$(id).remove();
+	  		    		}
+	  		    	}
+	        	});   	        
+	});
+</script>
+
+<title>配置单品策略</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="strategyForm" action="">	
+				<input type="hidden" name="bizCode" value="${bizCode}07">
+				<input type="hidden" name="channelGoodsCode" value="${channelGoods.channelGoodsCode!''}">
+			<#if lstChannelGoodsStrategy?? && lstChannelGoodsStrategy?size !=0> <#list lstChannelGoodsStrategy as channelGoodsStrategy>	
+				<div class="layui-form-item" id="param_${channelGoodsStrategy.strategyId!''}">
+				    <input type="checkbox" name="strategyId" value="${channelGoodsStrategy.strategyId!''}" lay-skin="primary" title="${channelGoodsStrategy.strategyName!''}"<#if channelGoodsStrategy.id??> checked</#if>>
+				</div> 
+				<#if channelGoodsStrategy.id??>${channelGoodsStrategy.strategyParamView!''}</#if>
+		  	</#list> </#if> 
+
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="strategyForm">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary" style="display: none" id="resetStrategy">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

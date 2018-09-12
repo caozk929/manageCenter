@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增渠道支付配置</title>
+    <!--layui 统一样式文件-->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .layui-form-item .layui-form-label{width: 100px;}
+        .layui-form-item .layui-input-block{margin-left: 140px;}
+    </style>
+</head>
+<body>
+    <div style="margin: 20px;">
+        <form id="acpForm" class="layui-form" action="" method="post">
+            <!-- 渠道-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>渠道</label>
+                <div class="layui-input-block">
+                    <select name="channelId" id="channelId">
+                        <#if apiChannels?? && apiChannels?size != 0>
+                            <#list apiChannels as apiChannel>
+                                <option value="${apiChannel.id }">${apiChannel.channelName }</option>
+                            </#list>
+                        </#if>
+                    </select>
+                </div>
+            </div>
+            <!-- 名称 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="configName" maxlength="88" required lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!-- 渠道代码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>渠道代码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="configCode" maxlength="50" required lay-verify="required" placeholder="请输入渠道代码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--合作商代码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>合作商代码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="partnerCode" maxlength="30" required lay-verify="required" placeholder="请输入合作商代码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--支付账号-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>支付账号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="payAccountName" maxlength="30" required lay-verify="required" placeholder="请输入支付账号" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--版本-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">版本</label>
+                <div class="layui-input-block">
+                    <input type="text" name="version" maxlength="10" placeholder="请输入版本" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--状态-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="status" value="1" title="启用" checked>
+                    <input type="radio" name="status" value="2" title="停用">
+                </div>
+            </div>
+            <!--字符编码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">字符编码</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="charset" value="UTF-8" title="UTF-8" checked>
+                </div>
+            </div>
+            <!--货币类型-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">货币类型</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="currency" value="RMB" title="RMB" checked>
+                </div>
+            </div>
+            <!--签名加密类型-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">签名加密类型</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="signType" value="SHA256" title="SHA256" checked>
+                </div>
+            </div>
+            <!--私钥文件名-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>私钥文件名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="privateKeyFileName" maxlength="50" required lay-verify="required" placeholder="请输入私钥文件名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--私钥密码-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>私钥密码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="privateKeyPwd" maxlength="50" required lay-verify="required" placeholder="请输入私钥密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--公钥文件名-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>公钥文件名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="publicKeyFileName" maxlength="50" required lay-verify="required" placeholder="请输入公钥文件名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--支付网关地址-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">支付网关地址</label>
+                <div class="layui-input-block">
+                    <input type="text" name="payUrl" maxlength="255" placeholder="请输入支付网关地址" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--前台回调URL-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">前台回调URL</label>
+                <div class="layui-input-block">
+                    <input type="text" name="returnUrl" maxlength="255" placeholder="请输入前台回调URL" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--后台回调URL-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">后台回调URL</label>
+                <div class="layui-input-block">
+                    <input type="text" name="notifyUrl" maxlength="255" placeholder="请输入后台回调URL" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--扩展字段一-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">扩展字段一</label>
+                <div class="layui-input-block">
+                    <input type="text" name="extend1" maxlength="255" placeholder="请输入扩展字段一" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--扩展字段二-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">扩展字段二</label>
+                <div class="layui-input-block">
+                    <input type="text" name="extend2" maxlength="255" placeholder="请输入扩展字段二" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!-- 备注-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="configRemarks" maxlength="255" placeholder="请输入备注" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <!-- 按钮 -->
+            <div class="layui-form-item">
+                <div style="width: 80%; margin: 0 auto; text-align: center;">
+                    <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+<script src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script>
+    var bizCode = '${bizCode }'.substring(0,5);
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            var url = "/admin/acp/o_add.do?bizCode="+bizCode+"02";
+            $.post(url, $("#acpForm").serialize(), function(data) {
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layui.table.reload("table");
+                    parent.layer.close(index);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+    });
+</script>
+</html>

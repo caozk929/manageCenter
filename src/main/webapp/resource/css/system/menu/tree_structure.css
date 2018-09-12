@@ -1,0 +1,87 @@
+@charset "utf-8";
+html,body{ background:#fff;}
+
+/*====================组织授权页面====================*/
+.ht_switch_content{ padding:30px 20px;}
+.ht_switch_content .lump_tree_content{ display:none; overflow:hidden;}
+.ht_switch_content .lump_tree_content.current{ display:block;}
+.lump_tree_content .lump_tree_modular{ width:44%; float:left;}
+.lump_tree_content .lump_tree_right{ padding-left:3%;}
+.lump_tree_modular .lump_tree_item{ border:1px solid #dedede; margin-bottom:16px; padding:12px 16px;}
+.lump_tree_modular .lump_tree_grade{ width:100%; border-radius:4px; box-sizing:border-box;}
+.lump_tree_grade .lump_tree_list{ font-size:15px; line-height:18px; padding:0 20px 0 30px; position:relative;}
+.lump_tree_list .lump_tree_input{ width:18px; height:18px; cursor:pointer; position:absolute; left:0; top:0;}
+.lump_tree_input input[type="checkbox"]{ vertical-align:top; opacity:0;}
+.lump_tree_input label{ width:100%; height:100%; background:url(../../../images/system/menu/icon_img.png) -6px -96px; cursor:pointer; position:absolute; left:0; top:0;}
+.lump_tree_input.current label{ background-position:-36px -96px;}
+.lump_tree_list .lump_tree_more{ width:12px; height:8px; background:url(../../../images/system/menu/icon_img.png) -9px -11px no-repeat; cursor:pointer; position:absolute; right:0; top:5px; display:none;}
+.lump_tree_list .lump_tree_more.current{ background-position:-159px -11px;}
+.lump_tree_modular .next_lump_tree{ padding:4px 0 0 28px; display:none;}
+.next_lump_tree .lump_tree_list{ margin-top:14px;}
+
+
+/*====================组织目录弹窗====================*/
+.ht_popup_screen{ padding:14px 20px; border-bottom:1px solid #edeff3;}
+.ht_popup_screen .popup_screen_modu{ font-size:14px; overflow:hidden;}
+.popup_screen_modu .screen_list{ float:left; margin-right:20px;}
+.popup_screen_modu .screen_name{ font-size:12px; line-height:28px;}
+.catalog_tree_list{ width:100%; margin-bottom:3px; white-space:nowrap;}
+.catalog_tree_list .catalog_icon{ width:24px; height:24px; vertical-align:top; white-space:nowrap; display:inline-block;}
+.catalog_tree_list .catalog_tree_icon{ background:url(../../../images/system/menu/icon_img.png) -123px -33px;}
+.catalog_tree_list .catalog_tree_icon.current{ background-position:-153px -33px; cursor:pointer;}
+.catalog_tree_list.hide .catalog_tree_icon{ background-position:-183px -33px;}
+.catalog_tree_list .catalog_content{ width:95%; height:24px; line-height:24px; vertical-align:top; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; border-radius:2px; box-sizing:border-box; padding-left:2px; margin-left:-4px; display:inline-block;}
+.catalog_tree_list .catalog_content:hover{ background:#f3f3f3;}
+.catalog_tree_list .catalog_content.current{ color:#0ae; background:#f3f3f3;}
+.catalog_tree_list .catalog_grade_icon{ background:url(../../../images/system/menu/icon_img.png) -63px -63px;}
+.catalog_tree_modular .next_catalog_tree{ padding-left:28px; display:none;}
+
+
+/*====================名称树状结构弹窗====================*/
+.name_catalog_popup{ width:700px; margin-left:-350px;}
+.name_catalog_popup .ht_popop_center{ height:400px;}
+.name_catalog_popup .lump_tree_item{ padding:8px 16px; margin-bottom:12px;}
+.name_catalog_popup .lump_tree_list{ font-size:13px;}
+.name_catalog_popup .next_lump_tree .lump_tree_list { margin-top:10px;}
+.lump_tree_grade .lump_value_list{ line-height:22px; padding:0 130px 0 20px;}
+.lump_value_list .lump_tree_input{ top:2px;}
+.lump_value_list .lump_tree_more{ top:7px;}
+.lump_value_list .lump_value_modu{ position:absolute; right:30px; top:0;}
+.lump_value_list .lump_value_name{ font-size:12px; float:left;}
+
+
+/*====================组织目录表格====================*/
+.catalog_tree_tabal{ border:1px solid #ddd; margin-bottom:20px;}
+.catalog_tree_tabal .catalog_table_top{ height:34px; color:#000; background:#efefef; border-bottom:1px solid #ddd;}
+.catalog_tree_tabal .catalog_list_content{ width:100%; box-sizing:border-box; overflow:hidden;}
+.catalog_list_content dt,.catalog_list_content dd{ width:10%; line-height:24px; padding:5px 8px; box-sizing:border-box; float:left;}
+.catalog_list_content .catalog_tree_item{ width:30%; height:34px; line-height:24px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; box-sizing:border-box; cursor:auto; display:block;}
+.catalog_tree_icon,.catalog_grade_icon{ width:24px; height:24px; background:url(../../../images/system/menu/icon_img.png) ; float:left;}
+.catalog_tree_item .catalog_tree_icon{ background-position:-123px -33px;}
+.catalog_tree_item .catalog_grade_icon{ background-position:-63px -63px; margin-right:4px;}
+.catalog_tree_item .catalog_tree_icon.current{ background-position:-153px -33px; cursor:pointer;}
+.catalog_tree_item.hide .catalog_tree_icon{ background-position:-183px -33px;}
+.catalog_operate .tabel_btn{ margin:2px 4px;}
+.next_catalog_modular{ display:none;}
+.catalog_list_grade02 .catalog_tree_item{ padding-left:24px;}
+.catalog_list_grade03 .catalog_tree_item{ padding-left:48px;}
+.catalog_list_grade04 .catalog_tree_item{ padding-left:72px;}
+.catalog_list_grade05 .catalog_tree_item{ padding-left:96px;}
+.catalog_list_grade06 .catalog_tree_item{ padding-left:120px;}
+.catalog_list_grade07 .catalog_tree_item{ padding-left:144px;}
+.catalog_list_grade08 .catalog_tree_item{ padding-left:168px;}
+.catalog_list_grade09 .catalog_tree_item{ padding-left:192px;}
+.catalog_list_content .width30{width: 30%;}
+
+/*----------按钮分区----------*/
+/*表格按钮*/
+.tabel_operate .tabel_btn{ width:20px; height:20px; background:url(../../../images/system/menu/icon_img.png) -5px -155px; margin:4px; float:right;}
+.tabel_operate .tabel_edit_icon{ background-position:-35px -155px;}
+.tabel_operate .tabel_delect_icon{ background-position: -65px -155px;}
+.tabel_operate .tabel_detail_icon:hover{ background-position:-245px -155px;}
+.tabel_operate .tabel_edit_icon:hover{ background-position:-275px -155px;}
+.tabel_operate .tabel_delect_icon:hover{ background-position: -305px -155px;}
+
+/*===============================模块公共样式===============================*/
+.main{ width:100%; height:100%; box-sizing:border-box; position:relative;}
+.box_content{ width:100%; padding:0 20px 20px; box-sizing:border-box;}

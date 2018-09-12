@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+<script>
+	//用iframe方式打开时，必须先reset一下，否则单选键不显示
+	$(document).ready(function(){
+	    $("#reset").click();
+	});
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            var url = "${path}/admin/commodity/attributeKey/save.do?bizCode=${bizCode}02";
+            $.post(url, $("#mainForm").serialize(), function(data){
+                if (data.status == "00000") {//提示成功后重新加载数据
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	parent.location.href="${path}/admin/commodity/attributeKey/list.do?bizCode=${bizCode}";
+                        return true;
+                    }, 1000);
+                } else {
+                    layer.alert(data.msg);
+                }
+            }, "JSON");
+            return false;//出错则不关闭窗口
+        });
+    });
+</script>
+<title>新增/编辑 属性键</title>
+</head>
+<body>
+	<div style="margin: 20px;">  	
+		<form class="layui-form" id="mainForm" action="">		
+			<input type="hidden" name="id" value="${attributeKey.id!''}">
+			<#if attributeKey.attributeKeyCode??>
+			<div class="layui-form-item">
+				<label class="layui-form-label">属性键代码</label>
+				<div class="layui-input-block">
+					<input type="text" name="attributeKeyCode" value="${attributeKey.attributeKeyCode!''}" readonly="true"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			</#if>
+			<div class="layui-form-item">
+				<label class="layui-form-label">属性键名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="attributeKeyName" value="${attributeKey.attributeKeyName!''}" required lay-verify="required" placeholder="请输入属性键名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			
+			<#if attributeKey.attributeKeyType??>
+			<#else>			
+			<div class="layui-form-item">
+				<label class="layui-form-label">属性键类型</label>
+				<div class="layui-input-block">
+				<!-- <#if attributeKey.attributeKeyType??>
+					<input type="radio" name="attributeKeyType" value="0" title="字符" <#if attributeKey.attributeKeyType==0> checked </#if>> 
+					<input type="radio" name="attributeKeyType" value="1" title="地址" <#if attributeKey.attributeKeyType==1> checked </#if>> 
+					<input type="radio" name="attributeKeyType" value="2" title="图片" <#if attributeKey.attributeKeyType==2> checked </#if>>  -->
+				<!-- <#else> -->	
+					<input type="radio" name="attributeKeyType" value="0" title="字符" checked> 
+				<!-- </#if> -->								
+				</div>												
+			</div>
+			</#if>
+
+			<div class="layui-form-item">
+				<div style="width: 80%; margin: 0 auto; text-align: center;">
+					<button class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

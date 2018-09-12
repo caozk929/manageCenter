@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>角色管理</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-btn-area{margin-top: 10px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-content .r-center th{text-align: center;}
+        td:nth-last-child(1){text-align: center;}
+        .r-search{margin: 10px 20px 0;}
+    </style>
+</head>
+<body>
+<!-- 搜索区域-->
+<div class="layui-collapse r-search">
+    <div class="layui-colla-item">
+        <h2 class="layui-colla-title">搜索</h2>
+        <div class="layui-colla-content layui-show">
+            <form id="roleSearchForm" action="/admin/role/v_list.do?bizCode=${bizCode }&pageNum=1" method="post">
+                <div class="layui-form-item" style="display: inline-block; margin-bottom: 0;">
+                    <label class="layui-form-label" style="width: 35px;">名称</label>
+                    <div class="layui-input-block" style="margin-left: 65px;">
+                        <#if role?? && role.name??>
+                            <input type="text" name="name" value="${role.name!'' }" placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+                        <#else>
+                            <input type="text" name="name" placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+                        </#if>
+                    </div>
+                </div>
+                <button style="margin-top: -3px;" class="layui-btn">搜索</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 按钮区域 -->
+<div class="r-content r-btn-area">
+    <!-- 按钮区域 -->
+    <blockquote class="site-text layui-elem-quote">
+        <@p.permission bizCode='${bizCode }02'>
+            <button data-id="" data-method="saveOrUpdate" class="layui-btn save"><i class="layui-icon">&#xe608;</i> 新增角色</button>
+        </@p.permission>
+    </blockquote>
+</div>
+<!-- 内容区域-->
+<div id="r-content" class="r-content">
+    <table lay-even style="margin:0;" class="layui-table">
+        <colgroup>
+            <col width="150">
+            <col width="100">
+            <col width="100">
+            <col width="200">
+        </colgroup>
+        <thead>
+        <tr class="r-center">
+            <th>名称</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <#if pageInfo.list?? && pageInfo.list?size != 0>
+            <#list pageInfo.list as role>
+                <tr>
+                    <td>${role.name!'' }</td>
+                    <td>${role.statusStr!'' }</td>
+                    <td>${role.remarks!'' }</td>
+                    <td>
+                        <@p.permission bizCode='${bizCode }03'>
+                            <bottom data-id="${role.id!'' }" data-method="saveOrUpdate" class="layui-btn layui-btn-mini layui-btn-normal">编辑</bottom>
+                        </@p.permission>
+                        <@p.permission bizCode='${bizCode }04'>
+                            <bottom data-id="${role.id!'' }" data-method="deleteById" class="layui-btn layui-btn-mini layui-btn-danger">删除</bottom>
+                        </@p.permission>
+                        <@p.permission bizCode='${bizCode }05'>
+                            <bottom data-id="${role.id!'' }" data-method="getUserByRoleId" class="layui-btn layui-btn-mini">查看角色用户</bottom>
+                        </@p.permission>
+                        <@p.permission bizCode='${bizCode }06'>
+                            <bottom data-id="${role.id!'' }" data-name="${role.name!'' }"data-method="exportUsers" class="layui-btn layui-btn-mini layui-btn-warm">导出角色用户</bottom>
+                        </@p.permission>
+                    </td>
+                </tr>
+            </#list>
+        </#if>
+        </tbody>
+    </table>
+    <!-- 分页容器-->
+    <div id="page" style="text-align: right;"></div>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode!'' }">
+    </#if>
+</div>
+</body>
+
+<!-- js方法，分页，搜索时候部分参数需要重新赋值-->
+<script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<!--搜索区域JS-->
+<script>
+    layui.use(['element'], function() {
+        var element = layui.element;
+    });
+</script>
+<!-- 分页JS-->
+<script>
+    var bizCode = $('#bizCode').val();
+    layui.use(['laypage'], function() {
+        var $ = layui.jquery, laypage = layui.laypage;
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'page', //注意，这里的 test1 是 ID，不用加 # 号
+            curr: Number('${pageInfo.pageNum }'),//当前页码需要在服务器端拿到
+            layout: ['count', 'prev', 'page', 'next', 'skip'],//自定义
+            limit: Number('${pageInfo.pageSize }'),//每页显示条数
+            groups: 10,//连续出现的页码数量
+            count: Number('${pageInfo.total }'), //数据总数，从服务端得到
+            jump: function(obj) {//点击分页按钮的回调函数
+                //异步加载数据
+                if (Number('${pageInfo.pageNum }') > 0 && Number('${pageInfo.pageNum }') != obj.curr) {
+                    var url = "/admin/role/v_list.do?bizCode=" + bizCode + "&pageNum=" + obj.curr;
+                    $('#roleSearchForm').attr('action', url);
+                    $('#roleSearchForm').submit();
+                }
+            }
+        });
+    });
+</script>
+<!-- 按钮赋值等js-->
+<script>
+    var bizCode = $('#bizCode').val();
+    layui.use(['layer'], function() {
+        var $ = layui.jquery, layer = layui.layer;
+        var active = {
+            saveOrUpdate: function () {//新增修改方法
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                var url = "/admin/role/v_saveOrUpdate.do?bizCode=";
+                if ($id != null && $id != "") {
+                    url += bizCode + "03";
+                } else {
+                    url += bizCode + "02";
+                }
+                //异步请求返回页面
+                $.post(url, {"id": $id}, function (data) {
+                    layer.open({
+                        type: 1 //返回html类型
+                        , title: '新增/编辑 角色'
+                        , area: ['700px', '500px']//窗口大小
+                        , shade: 0.3//显示透明罩效果
+                        , maxmin: true
+                        , btnAlign: 'c'//按钮位置居中
+                        , btn: [] //按钮
+                        , content: data
+                        , zIndex: 999 //重点1：层级
+                        , success: function (layero, index) {//参数1：当前dom,参数2：索引
+                            layer.setTop(layero); //重点2
+                        }
+                    });
+                }, "HTML");
+            },
+            deleteById: function() {
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定删除角色吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function () {//确定
+                        //异步删除
+                        $.ajax({
+                            url: "/admin/role/delete.do?bizCode=" + bizCode + "04",
+                            type: "POST",
+                            data: {"id": $id},
+                            dataType: "JSON",
+                            success: function (data) {
+                                layer.msg(data.msg);
+                                if (data.status == "00000") {
+                                    setTimeout(function () {
+                                        location.href = "/admin/role/v_list.do?bizCode=" + bizCode;
+                                    }, 2000);
+                                }
+                            }
+                        });
+                    },
+                    btn2: function () {//取消
+                        layer.closeAll();
+                    }
+                });
+            },
+            getUserByRoleId: function () {//获取角色下所属用户
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                layer.open({
+                    type: 2 //返回iframe类型
+                    ,title: '角色所属用户查看'
+                    ,area: ['900px', '500px']//窗口大小
+                    ,shade: 0.3//显示透明罩效果
+                    ,maxmin: true
+                    ,btnAlign: 'c'//按钮位置居中
+                    ,content: '/admin/role/o_userList.do?bizCode=${bizCode}05&id='+$id
+                    ,zIndex: 999 //重点1：层级
+                    ,success: function(layero, index){//参数1：当前dom,参数2：索引
+                        layer.setTop(layero); //重点2
+                    }
+
+                });
+
+            },
+            exportUsers: function() {
+                var that = this;
+                //多窗口模式，层叠置顶
+                var $id = $(this).data('id');//id
+                var $name = $(this).data('name');//name
+                //确认框
+                layer.open({//配置样式
+                    type: 0,//信息框
+                    title: '温馨提示：',
+                    content: '确定导出该角色所属用户吗？',
+                    shahe: 0.3,//遮罩效果
+                    time: 5000,//5秒没有点击自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function () {//确定
+                        layer.closeAll();
+                        location.href = "/admin/role/o_exportUsers.do?bizCode=" + bizCode + "06&id=" +$id+"&name="+$name;
+                    },
+                    btn2: function () {//取消
+                        layer.closeAll();
+                    }
+                });
+            }
+        }
+        //为按钮注入事件
+        $('.layui-btn, .layui-btn-normal, .layui-btn-danger,.layui-btn-warm').on('click', function() {
+            var $othis = $(this), $method = $othis.data('method');
+            active[$method] ? active[$method].call(this, $othis) : '';
+        });
+    });
+</script>
+</html>

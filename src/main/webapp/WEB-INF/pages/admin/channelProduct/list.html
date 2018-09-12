@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>渠道商品管理</title>
+	<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+	<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+	<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+    <style>
+        .r-content{padding: 0 20px;}
+        .r-content div{margin: 0;}
+        .r-btn-area{margin-top: 10px;}
+        .r-btn-area blockquote{margin-bottom: 0; border-right: 1px solid #e2e2e2; border-top: 1px solid #e2e2e2; padding: 5px;}
+        .r-search{margin: 10px 20px 0;}
+    </style> 
+</head>
+<body>
+    <!-- 搜索区域-->
+    <div class="layui-collapse r-search">
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title">搜索</h2>
+            <div class="layui-colla-content layui-show">
+                <form id="searchForm" action="${path}/admin/channelProduct/list.do" method="post">
+                	<input type="hidden" name="bizCode" value="${bizCode!''}">
+                    <div class="layui-form-item" style="margin-bottom: 0;">
+                        <label class="layui-form-label" style="width: 70px;">商品标题</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="productName" value="${channelProduct.productName!''}" placeholder="请输入商品标题" autocomplete="off" class="layui-input">
+                        </div>			     
+					    <div class="layui-input-inline">
+					      <input type="submit" class="layui-btn" value="搜索">
+					      <input type="reset" class="layui-btn layui-btn-primary">
+					    </div>					                           
+                    </div>                  
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- -->
+    <div class="r-content r-btn-area">
+        <!-- 按钮区域 -->
+        <blockquote class="site-text layui-elem-quote">
+            <button data-id="" data-method="bind" class="layui-btn bind"><i class="layui-icon">&#xe608;</i> 添加关联商品</button>
+        </blockquote>
+    </div>
+    <!-- 内容区域-->
+    <div id="r-content" class="r-content">        
+		<table class="layui-table" lay-filter="tblMain" id="page">
+		  <thead>
+		    <tr>
+		      <th lay-data="{checkbox:true, fixed: true}"></th>
+		      <th lay-data="{field:'productTitle', width:200}">商品标题</th>
+		      <th lay-data="{field:'productName', width:200}">商品名称</th>
+		      <th lay-data="{field:'productCode', width:200}">商品编码</th>
+		      <th lay-data="{field:'categoryName', width:200}">商品类目</th>
+		      <th lay-data="{field:'brand', width:200}">商品品牌</th>
+		      <th lay-data="{field:'series', width:200}">商品型号/系统</th>
+		      <!-- <th lay-data="{field:'productPrice', width:200}">价格范围</th> -->
+		      <th lay-data="{field:'statusStr', width:200}">状态</th>	      		      
+		      <th lay-data="{fixed: 'right', width:200, align:'center', toolbar: '#barMain'}">操作</th>
+		    </tr>
+		  </thead>
+		</table>		 
+		<script type="text/html" id="barMain">
+      {{#  if(d.status === 0 ){ }}
+        <a class="layui-btn layui-btn-primary layui-btn-mini" lay-event="onSell">上架</a>
+      {{#  } }}
+      {{#  if(d.status === 1 ){ }}
+        <a class="layui-btn layui-btn-primary layui-btn-mini" lay-event="close">下架</a>
+      {{#  } }}
+			<a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+  			<a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+		</script>        
+    </div>
+</body>
+<script>
+
+function openLayer(layer, url, header, width, heigth) {
+    layer.open({
+        type: 2 //返回iframe类型
+        , title: header
+        , area: [width, heigth]//窗口大小
+        , shade: 0.3//显示透明罩效果
+        , maxmin: true
+        , btnAlign: 'c'//按钮位置居中
+        , btn: [] //按钮
+        , content: url
+        , zIndex: 999 //重点1：层级
+        , success: function (layero, index) {//参数1：当前dom,参数2：索引
+            layer.setTop(layero); //重点2
+        },cancel: function(index, layero){ 
+        	location.reload();
+       	}  
+    });   	
+}  
+
+function update(layer, id) {
+    var url = "${path}/admin/channelProduct/update.do?bizCode=${bizCode}03&id=" + id;
+    openLayer(layer, url, '编辑商品', '1200px', '600px');    
+}
+
+function bind(layer) {
+	var url = "${path}/admin/channelProduct/bind.do?bizCode=${bizCode}02";
+    openLayer(layer, url, '关联商品', '1200px', '500px');	
+}
+
+function onSell(layer, id) {
+    var url = "${path}/admin/channelProduct/onSell.do?bizCode=${bizCode}05&id=" + id;
+    openLayer(layer, url, '商品上架', '700px', '300px');    
+}
+
+function del(layer, id) {
+    //确认框
+    layer.open({//配置样式
+        type: 0,//信息框
+        title: '温馨提示：',
+        content: '确定删除属性键吗？',
+        shahe: 0.3,//遮罩效果
+        time: 5000,//5秒没有点击自动关闭
+        btn: ['确定', '取消'],
+        yes: function () {//确定
+            //异步删除
+            $.ajax({
+                url: "${path}/admin/channelProduct/del.do?bizCode=${bizCode}05",
+                type: "POST",
+                data: {"id": id},
+                dataType: "JSON",
+                success: function (data) {
+                    if (data.status == "00000") {
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        },
+        btn2: function () {//取消
+            layer.closeAll();
+        }
+    });
+}
+
+function alive(layer, id) {
+     $.ajax({
+         url: "${path}/admin/channelProduct/alive.do?bizCode=${bizCode}05",
+         type: "POST",
+         data: {"id": id},
+         dataType: "JSON",
+         success: function (data) {
+             if (data.status == "00000") {
+                 layer.msg(data.msg);
+                 setTimeout(function () {
+                     location.reload();
+                 }, 1000);
+             } else {
+                 layer.msg(data.msg);
+             }
+         }
+     });
+}
+
+function close(layer, id) {
+    //确认框
+    layer.open({//配置样式
+        type: 0,//信息框
+        title: '温馨提示：',
+        content: '确定下架该商品吗？',
+        shahe: 0.3,//遮罩效果
+        time: 5000,//5秒没有点击自动关闭
+        btn: ['确定', '取消'],
+        yes: function () {//确定	
+		    $.ajax({
+		        url: "${path}/admin/channelProduct/close.do?bizCode=${bizCode}05",
+		        type: "POST",
+		        data: {"id": id},
+		        dataType: "JSON",
+		        success: function (data) {
+		            if (data.status == "00000") {
+		                layer.msg(data.msg);
+		                setTimeout(function () {
+		                    location.reload();
+		                }, 1000);
+		            } else {
+		                layer.msg(data.msg);
+		            }
+		        }
+		    });
+        },
+        btn2: function () {//取消
+            layer.closeAll();
+        }
+    });        
+}
+
+layui.use(['element', 'layer', 'table'], function(){
+	  var element = layui.element, layer = layui.layer, table = layui.table;		  
+	  table.init('tblMain', {
+		  elem: '#page',
+		  page:true, 
+		  even: true,
+		  id:'idMain',
+	            url: '${path}/admin/channelProduct/list.json',
+	            method:'POST',
+	            where : {bizCode:'${bizCode}01',productName:'${channelProduct.productName!''}'},
+	            limits: layui.globalConfig.limits,
+	            limit: 10,
+	            request: {
+	                pageName: 'pageNum', //页码的参数名称，默认：page
+	                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+	            },
+	            response: {
+	            	statusName: 'status',
+	            	statusCode: '00000', //成功的状态码，默认：0
+	                msgName: 'msg', //状态信息的字段名称，默认：msg
+	                countName: 'count', //数据总数的字段名称，默认：count
+	                dataName: 'data'
+	            }			  
+	  }); 		  
+	  //监听表格复选框选择
+	  table.on('checkbox(tblMain)', function(obj){
+	    console.log(obj)
+	  });
+	  //监听工具条
+	  table.on('tool(tblMain)', function(obj){
+			var data = obj.data;
+			if(obj.event === 'detail'){
+			  layer.msg('ID：'+ data.id + ' 的查看操作');
+			} else if(obj.event === 'del'){
+			  del(layer, data.id);
+			} else if(obj.event === 'edit'){
+			  	update(layer, data.id);
+			} else if(obj.event === 'onSell'){
+				onSell(layer, data.id);
+			} else if(obj.event === 'close'){
+				close(layer, data.id);
+			}
+	  });
+	  
+	  var active = {
+	    getCheckData: function(){ //获取选中数据
+	      var checkStatus = table.checkStatus('idMain')
+	      ,data = checkStatus.data;
+	      layer.alert(JSON.stringify(data));
+	    }
+	    ,getCheckLength: function(){ //获取选中数目
+	      var checkStatus = table.checkStatus('idMain')
+	      ,data = checkStatus.data;
+	      layer.msg('选中了：'+ data.length + ' 个');
+	    }
+	    ,isAll: function(){ //验证是否全选
+	      var checkStatus = table.checkStatus('idMain');
+	      layer.msg(checkStatus.isAll ? '全选': '未全选')
+	    }
+	    ,bind: function () {
+	    	bind(layer);
+	    }
+	  };
+
+      $('.layui-btn').on('click', function() {
+          var $othis = $(this), $method = $othis.data('method');
+          active[$method] ? active[$method].call(this, $othis) : '';
+      });	  
+});
+
+</script>
+</html>

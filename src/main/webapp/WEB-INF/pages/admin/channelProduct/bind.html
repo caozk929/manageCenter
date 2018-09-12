@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="${path}/resource/layui/css/layui.css" />
+<script type="text/javascript" src="${path}/resource/layui/layui.js"></script>
+<script type="text/javascript" src="${path}/resource/js/common/jquery-3.1.1.min.js"></script>
+<script src="${path}/resource/select2/4.0.3/js/select2.full.min.js"></script>
+<link href="${path}/resource/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+<script src="${path}/resource/select2/4.0.3/js/i18n/zh-CN.js"></script>
+<script>	
+	$(document).ready(function() {
+		var info = JSON.parse('${tree}');
+		$(".js-single").select2({
+            placeholder:'请选择',//默认文字提示
+            language: "zh-CN",
+            allowClear: true,
+            data: info,
+            escapeMarkup: function (markup) { return markup; },
+            templateResult: formatRepo,
+        });	
+		function formatRepo (repo) {
+			return repo.description;
+		}	
+	}); 
+	
+	layui.use('table', function(){
+		  var table = layui.table;		  
+		  table.init('tblMain', {
+			  page:true, 
+			  even: true,
+			  id:'idMain',
+		            url: '${path}/admin/channelProduct/bind.json',
+		            method:'POST',
+		            where : {bizCode:'${bizCode}02',categoryCode:'${channelProduct.categoryCode!''}',productName:'${channelProduct.productName!''}'},
+		            limits: layui.globalConfig.limits,
+		            limit: 10,
+		            request: {
+		                pageName: 'pageNum', //页码的参数名称，默认：page
+		                limitName: 'pageSize', //每页数据量的参数名，默认：limit
+
+		            },
+		            response: {
+		            	statusName: 'status',
+		            	statusCode: '00000', //成功的状态码，默认：0
+		                msgName: 'msg', //状态信息的字段名称，默认：msg
+		                countName: 'count', //数据总数的字段名称，默认：count
+		                dataName: 'data'
+		            }			  
+		  }); 	  
+		  //监听表格复选框选择
+		  table.on('checkbox(tblMain)', function(obj){
+		    console.log(obj)
+		  });
+		  //监听工具条
+		  table.on('tool(tblMain)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'del'){
+		      layer.confirm('真的删除行么', function(index){
+		        obj.del();
+		        layer.close(index);
+		      });
+		    } else if(obj.event === 'bind'){
+			  	bind(layer, data.productCode);
+			} 
+		  });
+		  //监听单元格编辑
+		  table.on('edit(tblMain)', function(obj) {
+		      var value = obj.value, data = obj.data, field = obj.field;		  
+			  data[field] = value; //更新缓存中的值
+		  });		  
+		  
+		  var $ = layui.$, active = {
+		    getCheckData: function(){ //获取选中数据
+		      var checkStatus = table.checkStatus('idMain'), data = checkStatus.data;
+              var productCodes = "";
+              for (var i=0; i<data.length; i++){
+                  if(i==0){
+                	  productCodes = data[i].productCode;
+                  }else{
+                	  productCodes += "," + data[i].productCode;
+                  }
+              }		    
+		      //layer.alert(JSON.stringify(data));
+              layer.alert(productCodes);
+              bind(layer, productCodes);
+		    }
+		    ,getCheckLength: function(){ //获取选中数目
+		      var checkStatus = table.checkStatus('idMain')
+		      ,data = checkStatus.data;
+		      layer.msg('选中了：'+ data.length + ' 个');
+		    }
+		    ,isAll: function(){ //验证是否全选
+		      var checkStatus = table.checkStatus('idMain');
+		      layer.msg(checkStatus.isAll ? '全选': '未全选')
+		    }
+		  };
+		  
+	      $('.layui-btn').on('click', function() {
+	          var $method = $(this).data('method');
+	          active[$method] ? active[$method].call(this) : '';	          
+	      });		  
+	});	
+	
+	function bind(layer, productCodes) {
+        $.ajax({
+            url: "${path}/admin/channelProduct/bindSave.do?bizCode=${bizCode}02",
+            type: "POST",
+            data: {"productCodes" : productCodes},
+            dataType: "JSON",
+            success: function (data) {
+                if (data.status == "00000") {
+                    layer.msg(data.msg);
+                    setTimeout(function () {
+                    	location.href = location.href;
+                    }, 1000);
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    }	
+	
+</script>
+
+<title>关联商品</title>
+</head>
+<body>
+    <div class="r-content r-btn-area">
+        <blockquote class="site-text layui-elem-quote">  
+        <form action="${path}/admin/channelProduct/bind.do">    
+        			<input type="hidden" name="bizCode" value="${bizCode!''}02">
+                    <div class="layui-form-item" style="margin-bottom: 0;">
+					    <label class="layui-form-label" style="width: 70px;">所属类目</label>
+					    <div class="layui-input-inline">
+							<select class="js-single" style="width:200px;" id="categoryCode" name="categoryCode">
+							<#if category??>
+								<option value="${category.categoryCode!''}" selected="selected">${category.categoryName!''}</option>
+							</#if>
+							</select> 	
+					    </div>
+                        <label class="layui-form-label" style="width: 70px;">商品名称</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="productName" value="${channelProduct.productName!''}" placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+                        </div>				     
+					    <div class="layui-input-inline">
+					      <input type="submit" class="layui-btn" value="搜索">
+					      <input type="reset" class="layui-btn layui-btn-primary">
+					    </div>					                           
+                    </div> 
+        </form>
+        </blockquote>
+    </div>
+    
+	<div style="margin: 20px;">
+		<button class="layui-btn" data-method="getCheckData">关联所选</button>
+		<table class="layui-table" lay-filter="tblMain">
+		  <thead>
+		    <tr>
+		      <th lay-data="{checkbox:true, fixed: true}"></th>
+		      <th lay-data="{field:'productName', width:160}">商品名称</th>
+		      <th lay-data="{field:'productCode', width:160}">商品编码</th>
+		      <th lay-data="{field:'categoryName', width:160}">所属类目</th>		      
+		      <th lay-data="{field:'brand', width:160}">品牌</th>
+		      <th lay-data="{field:'series', width:160}">型号</th>
+		      <th lay-data="{field:'productCount', width:100}">库存</th>
+		      <th lay-data="{field:'bindStr', width:100, fixed: 'right'}">关联状态</th>
+		      <th lay-data="{fixed: 'right', width:100, align:'center', toolbar: '#barMain'}">操作</th>
+		    </tr>
+		  </thead>
+		</table>		 
+		<script type="text/html" id="barMain">
+			<a class="layui-btn layui-btn-mini" lay-event="bind">关联</a>
+		</script>	
+	</div>    
+</body>
+</html>

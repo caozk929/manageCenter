@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>新增/编辑 角色</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css"/>
+    <!-- 自定义样式 -->
+    <style>
+        .permission-list{border: 1px solid #eee; overflow: hidden;}
+        .permission-list .permission-list-shang{background: #efefef; padding: 0 0 10px 10px; margin-bottom: 2px;}
+        .permission-list .permission-list-xia{padding: 0 10px 10px 30px;}
+        .permission-list .permission-list-child{padding: 5px 0; overflow: hidden; border-bottom: 1px solid #eee;}
+        .permission-list .permission-list-child-l{display: inline-block; width: 130px; float: left;}
+        .permission-list .permission-list-child-r{margin-left: 130px;}
+        .open{float: right; display: inline-block;width: 50px; text-align: left; margin-top: 10px; margin-right: 10px;
+            line-height: 18px; cursor: pointer; color: #666; background: url("/resource/images/system/role/open-666.png") no-repeat right top;
+            background-size: 20px auto;}
+        .open:hover{color: #5FB878; background: url("/resource/images/system/role/open.png") no-repeat right top; background-size: 20px auto;}
+        .permission-list-shang .close{background: url("/resource/images/system/role/close-666.png") no-repeat right top; background-size: 20px auto;}
+        .permission-list-shang .close:hover{background: url("/resource/images/system/role/close.png") no-repeat right top; background-size: 20px auto;}
+    </style>
+    <script src="/resource/layui/layui.all.js"></script>
+    <script src="/resource/js/common/layui/global-config.js" charset="utf-8"></script>
+    <script type="text/jscript" src="/resource/js/common/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+    <div style="margin: 20px;">
+        <form id="roleForm" action="" class="layui-form" method="post">
+            <!-- 名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>角色名称</label>
+                <div class="layui-input-block">
+                    <#if role??>
+                        <input type="text" name="name" value="${role.name!'' }" maxlength="50" required  lay-verify="required" placeholder="角色名称" autocomplete="off" class="layui-input">
+                    <#else>
+                        <input type="text" name="name" maxlength="50" required  lay-verify="required" placeholder="角色名称" autocomplete="off" class="layui-input">
+                    </#if>
+                </div>
+            </div>
+            <!-- 状态-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><sapn style="color: red;">*</sapn>状态</label>
+                <div class="layui-input-block">
+                    <#if role?? && role.status == 0>
+                        <input type="radio" name="status" required  lay-verify="required" value="1" title="正常">
+                        <input type="radio" name="status" required  lay-verify="required" value="0" title="失效" checked>
+                    <#else>
+                        <input type="radio" name="status" required  lay-verify="required" value="1" title="正常" checked>
+                        <input type="radio" name="status" required  lay-verify="required" value="0" title="失效">
+                    </#if>
+                </div>
+            </div>
+            <!-- 权限-->
+            <#if menus?? && menus?size != 0>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限</label>
+                    <div class="layui-input-block">
+                        <#list menus as menu>
+                            <dl class="permission-list">
+                                <dt class="permission-list-shang">
+                                    <input id="checkbox${menu.id!'' }" class="menuIds" type="checkbox" name="menuIds" value="${menu.id }" lay-skin="primary" title="${menu.name }">
+                                    <div class="open close">展开</div>
+                                </dt>
+                                <#if menu.children?? && menu.children?size != 0>
+                                    <div style="display: none;">
+                                        <#list menu.children as child>
+                                            <dd class="permission-list-xia">
+                                                <dl class="permission-list-child">
+                                                    <dt class="permission-list-child-l">
+                                                        <input id="checkbox${child.id!'' }" class="menuIds" type="checkbox" name="menuIds" value="${child.id }" lay-skin="primary" title="${child.name }">
+                                                    </dt>
+                                                    <#if child.children?? && child.children?size != 0>
+                                                        <dd class="permission-list-child-r">
+                                                            <#list child.children as btn>
+                                                                <input id="checkbox${btn.id!'' }" class="menuIds" type="checkbox" name="menuIds" value="${btn.id }" lay-skin="primary" title="${btn.name }">
+                                                            </#list>
+                                                        </dd>
+                                                    </#if>
+                                                </dl>
+                                            </dd>
+                                        </#list>
+                                    </div>
+                                </#if>
+                            </dl>
+                        </#list>
+                    </div>
+                </div>
+            </#if>
+            <!-- 备注-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <#if role??>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......">${role.remarks!'' }</textarea>
+                    <#else>
+                        <textarea class="layui-textarea" name="remarks" placeholder="备注......"></textarea>
+                    </#if>
+                </div>
+            </div>
+            <!-- 按钮-->
+            <div class="layui-form-item">
+                <div style="width: 80%; margin: 0 auto; text-align: center;">
+                    <button class="layui-btn" lay-filter="save" lay-submit>保存</button>
+                </div>
+            </div>
+            <#if role??>
+                <input id="roleId" type="hidden" name="id" value="${role.id!'' }"/>
+            </#if>
+        </form>
+    </div>
+    <#if menuIds??>
+        <input type="hidden" id="menuIds" value="${menuIds!'' }">
+    </#if>
+    <#if bizCode??>
+        <input type="hidden" id="bizCode" value="${bizCode!'' }">
+    </#if>
+</body>
+<script>
+    var bizCode = $('#bizCode').val();
+    var result = true;//js影响出现多次提及问题，暂不知道原因，所有用这个判断控制提及一次
+    layui.use('form', function() {
+        var form = layui.form, layer = layui.layer;
+        //监听提交
+        form.on('submit(save)', function(data) {
+            if (result) {
+                result = false;
+                var url = layui.globalConfig.adminUrl + "role/saveOrUpdate.do?bizCode=";
+                var $roleId = $('#roleId').val();
+                if ($roleId) {
+                    url += bizCode + "03";
+                } else {
+                    url += bizCode + "02";
+                }
+                $.post(url, $("#roleForm").serialize(), function (data) {
+                    if (data.status == "00000") {//提示成功后重新加载数据
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            location.href = "/admin/role/v_list.do?bizCode=" + bizCode;
+                            return true;
+                        }, 2000);
+                    } else {
+                        result = true;
+                        layer.alert(data.msg);
+                    }
+                }, "JSON");
+                return false;//出错则不关闭窗口
+            }
+        });
+    });
+</script>
+<script>
+    //权限点击事件
+    $(document).ready(function() {
+        /* 一级菜单点击事件 */
+        $('.permission-list-shang .layui-form-checkbox').click(function() {
+            //一级选中，二级三级必须全部选中
+            var $dl = $(this).parent().parent();
+            var $div = $dl.children('div');
+            var $dd = $div.children('dd');
+            var $div_has = $(this).hasClass('layui-form-checked');//判断是否含有样式，用于判断子菜单是否需要选中
+            $($dd).find('.layui-form-checkbox').each(function(index, element) {//样式显示
+                //判断当前是勾选还是取消
+                if ($div_has) {
+                    $(element).addClass('layui-form-checked');//样式效果显示
+                } else {
+                    $(element).removeClass('layui-form-checked');//样式效果取消
+                }
+            });
+            $($dd).find('.menuIds').each(function(index, element) {//checkbox选中和取消效果
+                if ($div_has) {
+                    $(element).prop('checked', true);
+                } else {
+                    $(element).prop('checked', false);
+                }
+            });
+        });
+
+        /* 二级菜单点击事件 */
+        $('.permission-list-child-l .layui-form-checkbox').click(function() {
+            //二级选中，一级必须选中，二级对应的下级也必须选中
+            var $dl = $(this).parent().parent();
+            var $dd = $dl.children('dd');
+            var $div_has = $(this).hasClass('layui-form-checked');//判断是否含有样式，用于判断子菜单是否需要选中
+            //针对三级处理{一级菜单}处理
+            var $dt = $($dl).parent().parent().parent().children('.permission-list-shang');
+            $($dt).find('.layui-form-checkbox').each(function(index, element) {//样式显示
+                //判断当前是勾选还是取消
+                if ($div_has) {
+                    $(element).addClass('layui-form-checked');//样式效果显示
+                }
+            });
+            $($dt).find('.menuIds').each(function(index, element) {//checkbox选中和取消效果
+                if ($div_has) {
+                    $(element).prop('checked', true);
+                }
+            });
+            //针对下级{三级菜单}处理
+            $($dd).find('.layui-form-checkbox').each(function(index, element) {//样式显示
+                //判断当前是勾选还是取消
+                if ($div_has) {
+                    $(element).addClass('layui-form-checked');//样式效果显示
+                } else {
+                    $(element).removeClass('layui-form-checked');//样式效果取消
+                }
+            });
+            $($dd).find('.menuIds').each(function(index, element) {//checkbox选中和取消效果
+                if ($div_has) {
+                    $(element).prop('checked', true);
+                } else {
+                    $(element).prop('checked', false);
+                }
+            });
+        });
+        /* 三级菜单点击事件 */
+        $('.permission-list-child-r .layui-form-checkbox').click(function() {
+            //三级选中，一级，二级必须选中
+            var $dl = $(this).parent().parent();
+            var $dt = $dl.children('.permission-list-child-l');
+            var $div_has = $(this).hasClass('layui-form-checked');//判断是否含有样式，用于判断子菜单是否需要选中
+            //处理一级菜单
+            var $parent_dl = $dl.parent().parent().parent();
+            var $parent_dt = $parent_dl.children('.permission-list-shang');
+            $($parent_dt).find('.layui-form-checkbox').each(function(index, element) {//样式显示
+                //判断当前是勾选还是取消
+                if ($div_has) {
+                    $(element).addClass('layui-form-checked');//样式效果显示
+                }
+            });
+            $($parent_dt).find('.menuIds').each(function(index, element) {//checkbox选中和取消效果
+                if ($div_has) {
+                    $(element).prop('checked', true);
+                }
+            });
+            //处理二级菜单
+            $($dt).find('.layui-form-checkbox').each(function(index, element) {//样式显示
+                //判断当前是勾选还是取消
+                if ($div_has) {
+                    $(element).addClass('layui-form-checked');//样式效果显示
+                }
+            });
+            $($dt).find('.menuIds').each(function(index, element) {//checkbox选中和取消效果
+                if ($div_has) {
+                    $(element).prop('checked', true);
+                }
+            });
+        });
+        //初始化样式{权限样式复选框勾选效果}
+        var $menuIds = $('#menuIds').val();
+        if ($menuIds) {
+            var $array = $menuIds.split(",");
+            for (var index = 0; index < $array.length; index++) {
+                $('#checkbox' + $array[index]).prop("checked", true);//checkbox选中
+                $('#checkbox' + $array[index] + "+ div").addClass('layui-form-checked');
+            }
+        }
+        //收起和张开js注入
+        $('.open').click(function() {
+            var $dt = $(this).parent();
+            var $div = $($dt).next('div');
+            $(this).toggleClass('close');//按钮效果
+            if ($(this).hasClass('close')) {
+                $(this).text('展开');
+            } else {
+                $(this).text('收起');
+            }
+            $($div).slideToggle(500);//展开和收缩
+        });
+    });
+</script>
+</html>
