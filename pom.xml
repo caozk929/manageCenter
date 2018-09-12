@@ -162,6 +162,12 @@
 			<version>1.4.0</version>
 			<type>pom</type>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.4.5</version>
+		</dependency>
 
 
 
