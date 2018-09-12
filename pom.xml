@@ -155,9 +155,16 @@
 		    	</exclusion>
 		    </exclusions>
 		</dependency>
-		
-		
-						
+		<!-- https://mvnrepository.com/artifact/org.apache.shiro/shiro-all -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-all</artifactId>
+			<version>1.4.0</version>
+			<type>pom</type>
+		</dependency>
+
+
+
 	</dependencies>
 	<profiles>
 		<profile>
