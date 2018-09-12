@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	   xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-2.0.xsd">
+
+	<!-- 引入属性文件 -->
+	<context:property-placeholder location="classpath:config/rabbitmq.properties" order="4" ignore-unresolvable="true"/>
+
+	<!--配置connection-factory，指定连接rabbit server参数 -->
+	<rabbit:connection-factory id="rabbitConnectionFactory" addresses="${rabbitmq.addresses}"
+							   username="${rabbitmq.username}"
+							   password="${rabbitmq.password}"
+							   channel-cache-size="${rabbitmq.channel.cache.size}"
+	/>
+	<!--定义rabbit template用于数据的接收和发送 -->
+	<rabbit:template id="amqpTemplate"  connection-factory="rabbitConnectionFactory" />
+
+	<!--消息发送者-->
+	<bean id="rabbitMsgSender" class="com.zjht.manager.common.message.RabbitMsgSender">
+		<property name="amqpTemplate" ref="amqpTemplate" />
+		<property name="directExchange" value="${rabbitmq.direct.exchange}"/>
+		<property name="fanoutExchange" value="${rabbitmq.fanout.exchange}"/>
+		<property name="topicExchange" value="${rabbitmq.topic.exchange}"/>
+		<property name="directRoutekeys">
+			<list>
+				<!--<value>manager.api.channel</value>-->
+			</list>
+		</property>
+		<property name="fanoutRoutekeys">
+			<list>
+				<value>manager.api.channel</value>
+			</list>
+		</property>
+		<property name="topicRoutekeys">
+			<list>
+				<!--<value>manager.api.channel</value>-->
+			</list>
+		</property>
+		<property name="delayMap">
+			<map>
+				<entry key="manager.api.channel" value="480000"></entry>
+			</map>
+		</property>
+
+	</bean>
+	<!-- 消息发送-->
+	<bean id="msgTemplate" class="com.zjht.manager.common.message.MsgTemplate" >
+		<property name="sender" ref="rabbitMsgSender"/>
+	</bean>
+
+	<!-- 定义direct exchange，绑定queue -->
+	<rabbit:direct-exchange name="${rabbitmq.direct.exchange}" auto-declare="true" durable="true" auto-delete="false" delayed="true">
+	</rabbit:direct-exchange>
+	<!--定义fanout queue -->
+	<rabbit:queue name="fanoutQueue" durable="true" auto-delete="false" exclusive="false" />
+	<!-- 定义fanout exchange，绑定queue -->
+	<rabbit:fanout-exchange name="${rabbitmq.fanout.exchange}" auto-declare="true" durable="true" auto-delete="false" delayed="true">
+		<rabbit:bindings>
+			<rabbit:binding queue="fanoutQueue"/>
+		</rabbit:bindings>
+	</rabbit:fanout-exchange>
+
+	<!-- 定义topic exchange，绑定queue -->
+	<rabbit:topic-exchange name="${rabbitmq.topic.exchange}" auto-declare="true" durable="true" auto-delete="false" delayed="true">
+	</rabbit:topic-exchange>
+
+	<!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
+	<rabbit:admin id="rabbitAdmin" connection-factory="rabbitConnectionFactory" />
+
+
+
+	<!--定义queue  配置延迟队列的信息-->
+	<!--<rabbit:queue name="delay_queue"-->
+				  <!--durable="true"-->
+				  <!--auto-declare="true"-->
+				  <!--auto-delete="false"-->
+				  <!--declared-by="connectAdmin">-->
+	<!--</rabbit:queue>-->
+
+	<!--<rabbit:topic-exchange name="delayChangeTest"-->
+						   <!--declared-by="connectAdmin" delayed="true">-->
+		<!--<rabbit:bindings>-->
+			<!--<rabbit:binding queue="delay_queue" pattern="order.delay.notify" />-->
+		<!--</rabbit:bindings>-->
+	<!--</rabbit:topic-exchange>-->
+
+</beans>
