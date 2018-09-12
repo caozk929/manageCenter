@@ -3,6 +3,9 @@ package com.zjht.manager.exception;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.support.spring.FastJsonJsonView;
+import com.zjht.manager.common.dto.ApiConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
@@ -23,6 +26,16 @@ public class CommonExceptionHandler implements HandlerExceptionResolver {
 			HandlerMethod handlerMethod = (HandlerMethod)handler;
 			log.error(handlerMethod.getBeanType().getName(), ex);
 		}
-		return null;
+		ModelAndView mv = new ModelAndView();
+        /*  使用FastJson提供的FastJsonJsonView视图返回，不需要捕获异常   */
+		FastJsonJsonView view = new FastJsonJsonView();
+		JSONObject json = new JSONObject();
+		json.put(ApiConstants.STATUS, ApiConstants.FAIL);
+		String errMsg = ex.getMessage()==null?ApiConstants.FAIL_COMM_MSG:ex.getMessage();
+		json.put(ApiConstants.MSG, errMsg);
+		view.setAttributesMap(json);
+		mv.setView(view);
+
+		return mv;
 	}
 }

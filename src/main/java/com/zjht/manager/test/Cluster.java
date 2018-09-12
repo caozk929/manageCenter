@@ -17,7 +17,7 @@ public class Cluster {
     }
 
     private static JedisCluster CreateCluster() {
-        Set jedisnodes = new HashSet();
+        Set<HostAndPort> jedisnodes = new HashSet<HostAndPort>();
         jedisnodes.add(new HostAndPort("172.16.94.248", 7000));
         jedisnodes.add(new HostAndPort("172.16.94.248", 7001));
         jedisnodes.add(new HostAndPort("172.16.94.248", 7002));

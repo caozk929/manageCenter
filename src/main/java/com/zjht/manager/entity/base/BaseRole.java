@@ -1,101 +1,105 @@
 package com.zjht.manager.entity.base;
 
-import java.util.Date;
-import java.util.List;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import com.google.common.collect.Lists;
-import com.zjht.manager.entity.SysMenu;
-import com.zjht.manager.entity.User;
+@Table(name = "t_role")
+public class BaseRole implements java.io.Serializable{
 
-public class BaseRole implements java.io.Serializable {
+    private static final long serialVersionUID = -4369258816974132761L;
+    /**
+     * 角色标识id
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY,generator ="select lpad(nextval('SEQ_ROLE'),12,'0')")
+    private String id;
 
-    private static final long serialVersionUID = 597694949424142173L;
+    /**
+     * 角色名
+     */
+    private String name;
 
-    private Long              id;
+    /**
+     * 角色状态（0-失效; 1-正常）
+     */
+    private Integer status;
 
-    private String            roleName;
+    /**
+     * 角色描述
+     */
+    private String remarks;
 
-    private Integer           roleType;
-
-    private Integer           status;
-
-    private Date              createTime;
-
-    private Date              updateTime;
-
-    private List<User>        userList         = Lists.newArrayList(); // 拥有用户列表
-
-    private List<SysMenu>     menuList         = Lists.newArrayList(); // 拥有菜单列表
-
-
-    public BaseRole() {}
-
-    public BaseRole(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
+    /**
+     * 获取角色标识id
+     *
+     * @return id - 角色标识id
+     */
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    /**
+     * 设置角色标识id
+     *
+     * @param id 角色标识id
+     */
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getRoleName() {
-        return roleName;
+    /**
+     * 获取角色名
+     *
+     * @return name - 角色名
+     */
+    public String getName() {
+        return name;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    /**
+     * 设置角色名
+     *
+     * @param name 角色名
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Integer getRoleType() {
-        return roleType;
-    }
-
-    public void setRoleType(Integer roleType) {
-        this.roleType = roleType;
-    }
-
+    /**
+     * 获取角色状态（0-失效; 1-正常）
+     *
+     * @return status - 角色状态（0-失效; 1-正常）
+     */
     public Integer getStatus() {
         return status;
     }
 
+    /**
+     * 设置角色状态（0-失效; 1-正常）
+     *
+     * @param status 角色状态（0-失效; 1-正常）
+     */
     public void setStatus(Integer status) {
         this.status = status;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    /**
+     * 获取角色描述
+     *
+     * @return remarks - 角色描述
+     */
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    /**
+     * 设置角色描述
+     *
+     * @param remarks 角色描述
+     */
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
-    }
-
-    public List<SysMenu> getMenuList() {
-        return menuList;
-    }
-
-    public void setMenuList(List<SysMenu> menuList) {
-        this.menuList = menuList;
-    }
-
 }

@@ -1,59 +1,20 @@
 package com.zjht.manager.dao;
 
+import com.zjht.manager.entity.RoleMenu;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+import tk.mybatis.mapper.common.Mapper;
+
 import java.util.List;
 
-import com.zjht.manager.entity.Role;
-import com.zjht.manager.entity.RoleMenu;
-import com.zjht.manager.entity.SysMenu;
-import org.springframework.stereotype.Repository;
-
 @Repository
-public interface RoleMenuDao {
+public interface RoleMenuDao extends Mapper<RoleMenu> {
 
     /**
-     * 获取列表
-     * 
+     * 根据角色Id查询菜单Id
+     * @param roleId
      * @return
      */
-    public List<RoleMenu> getList(Long id);
-
-    /**
-     * 通过id查找
-     * 
-     * @param id
-     * @return
-     */
-    public RoleMenu findById(Long id);
-    
-    /**
-     * 通过roleId查找
-     * 
-     * @param id
-     * @return
-     */
-    public List<RoleMenu> findByRoleId(Long id);
-
-    /**
-     * 通过roles查找
-     * 
-     * @param roles
-     * @return
-     */
-    public List<SysMenu> findByRoles(List<Role> roles);
-
-    /**
-     * 保存
-     * 
-     * @param bean
-     * @return
-     */
-    public RoleMenu save(RoleMenu bean);
-
-    /**
-     * 删除
-     * 
-     * @param id
-     */
-    public void delete(Long id);
+    List<String> listMenuIdByRoleId(@Param("roleId") String roleId);
 
 }

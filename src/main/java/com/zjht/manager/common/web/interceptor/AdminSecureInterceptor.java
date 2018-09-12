@@ -1,140 +1,83 @@
 package com.zjht.manager.common.web.interceptor;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import com.zjht.manager.common.web.Constants;
+import com.zjht.manager.common.web.annotation.NoNeedAuth;
+import com.zjht.manager.common.web.session.SessionProvider;
+import com.zjht.manager.common.web.threadvariable.RequestThread;
+import com.zjht.manager.entity.Menu;
+import com.zjht.manager.entity.User;
+import com.zjht.manager.service.MenuService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import com.google.common.collect.Lists;
-import com.zjht.manager.common.web.Constants;
-import com.zjht.manager.common.web.threadvariable.AdminThread;
-import com.zjht.manager.dao.RoleMenuDao;
-import com.zjht.manager.entity.Role;
-import com.zjht.manager.entity.SysMenu;
-import com.zjht.manager.entity.User;
-import com.zjht.manager.entity.UserRole;
-
 public class AdminSecureInterceptor extends HandlerInterceptorAdapter {
-	private static String urlRule="/admin/logout.do;/admin/index.do;/admin/login.do;/admin/main.do;/admin/left.do;/admin/right.do";
 
     @Autowired
-    private RoleMenuDao rmMng;
-    
+    private MenuService menuService;
+    @Autowired
+    private SessionProvider sessionProvider;
+
+    private Logger logger = LoggerFactory.getLogger(AdminSecureInterceptor.class);
+
     @Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
     		 Object obj) throws Exception{
-        String autokey = (String) request.getAttribute(Constants.AUTH_KEY);
-        String s = "";
-        try {
-        	s=getURI(request.getRequestURI(), request.getContextPath());
-		} catch (IllegalStateException e) {
-			response.sendError(404);
-			return false;
-		}
-        if(s.equals("/index.do")||s.equals("/login.do")){
-            return true;
+        logger.debug("前置处理");
+
+        HttpServletRequest httpRequest = (HttpServletRequest)request;
+        String url = httpRequest.getRequestURI();
+        url = url.split(";")[0];
+        //如果请求配置了不需要权限注解，直接放过请求
+        if(obj instanceof HandlerMethod){
+            HandlerMethod handlerMethod = (HandlerMethod)obj;
+            NoNeedAuth noNeedAuth = handlerMethod.getMethod().getAnnotation(NoNeedAuth.class);
+            if(noNeedAuth != null){
+                Menu menu = menuService.findByPath(url);
+                if(menu != null){
+                    RequestThread.get().setAttribute(Constants.BUSINESS_CODE, menu.getCode());
+                }
+                return true;
+            }
         }
-        if(StringUtils.isBlank(autokey)){
-            redirectToLogin(request, response);
-            return false;
+        Subject currentUser = SecurityUtils.getSubject();
+        //操作的业务编码
+        String bizCode = request.getParameter(Constants.BUSINESS_CODE);
+        if(bizCode == null){
+            throw new IllegalArgumentException(Constants.BUSINESS_CODE + "为空");
         }
-        User user=AdminThread.get();
-        String url=request.getRequestURI();
-        String preUrl=url.split(";")[0];
-        //菜单
-		Set<UserRole> set=user.getUserRoles();
-		boolean flag=false;
-		if (urlRule.indexOf(preUrl)!=-1) {
-			flag=true;
-		}
-		if (set!=null&&set.size()>0&&!flag) {
-			List<SysMenu> listMenu=Lists.newArrayList();
-			List<Role> listRole=Lists.newArrayList();
-			for (UserRole ur : set) {
-				listRole.add(ur.getRole());
-			}
-			listMenu=rmMng.findByRoles(listRole);
-			if (listMenu!=null&&listMenu.size()>0) {
-				for (SysMenu sysMenu : listMenu) {
-					String path=sysMenu.getPath();
-					if (StringUtils.isNotBlank(path)&&StringUtils.isNotBlank(preUrl)) {
-						String[] paths=path.split("@@");
-						for (String p : paths) {
-							if (StringUtils.isNotBlank(p)) {
-								int index=p.indexOf("?");
-								if (p.contains("?")&&index!=p.length()-1) {
-									String params=p.substring(index+1);
-                                    String realPreUrl=p.substring(0, index);
-                                    if (!url.contains(realPreUrl)) {
-                                        continue;
-                                    }
-									String[] pavs=params.split("&");
-									int rightCount=0;
-									for (String pav : pavs) {
-										if (StringUtils.isNotBlank(pav)) {
-											String pValue=request.getParameter(pav.split("=")[0]);
-											if (pav.split("=")[1].equals(pValue)) {
-											    rightCount++;
-											}
-										}
-									}
-									if (rightCount==pavs.length) {
-									    flag=true;
-                                    }
-								}else if ((!p.contains("?"))&&url.indexOf(p)!=-1) {
-									flag=true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (!flag) {
-			response.sendError(403);
-			return false;
-		}
-        return true;
+        Menu menu = menuService.findByCode(bizCode);
+        if(menu==null){
+            throw new IllegalArgumentException(Constants.BUSINESS_CODE + ":" + bizCode + "对应的请求不存在");
+        }
+        //如果请求的url和配置的菜单不匹配
+        if(!menu.getPath().contains(url)){
+            throw new IllegalArgumentException(Constants.BUSINESS_CODE + ":" + bizCode + "和请求" + url + "不匹配");
+        }
+        if(!currentUser.isPermitted(bizCode)){
+            throw new IllegalArgumentException("您不具有：" + bizCode + "请求的权限");
+        }
+        return true;//返回 false 将中断后续拦截器链的执行
     }
 
-    public static String getURI(String s, String s1)
-        throws IllegalStateException{
-        int i = 0;
-        int j = 0;
-        int k = 1;
-        if(!StringUtils.isBlank(s1)){
-            k++;
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        //获取管理员信息
+        User user=sessionProvider.getUser();
+        //将用户信息添加入model
+        if (user != null && modelAndView != null) {
+            modelAndView.addObject(Constants.MEMBER, user);
+            modelAndView.addObject(Constants.PERMISSIONS, sessionProvider.getPermissions());
         }
-        for(; j < k && i != -1; j++){
-            i = s.indexOf('/', i + 1);
-        }
-        if(i <= 0){
-            throw new IllegalStateException("admin access path not like '/admin/...' pattern: "+s);
-        }else{
-            return s.substring(i);
-        }
-    }
-
-    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String s = request.getRequestURI();
-        int i = StringUtils.countMatches(s, "/");
-        StringBuilder stringbuilder = new StringBuilder();
-        int j = 2;
-        if(!StringUtils.isBlank(request.getContextPath())){
-            j++;
-        }
-        for(; j < i; j++){
-            stringbuilder.append("../");
-        }
-        stringbuilder.append("index.do");
-        response.sendRedirect(stringbuilder.toString());
+        super.postHandle(request, response, handler, modelAndView);
     }
 
 }

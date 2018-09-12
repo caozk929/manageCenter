@@ -3,13 +3,13 @@ package com.zjht.manager.api.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zjht.manager.common.dto.ResultDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.zjht.manager.api.common.ApiConstants;
-import com.zjht.manager.api.common.CommApiException;
-import com.zjht.manager.api.common.ResultDto;
+import com.zjht.manager.common.dto.ApiConstants;
+import com.zjht.manager.common.dto.CommApiException;
 import com.zjht.manager.entity.User;
 
 @Controller
@@ -20,11 +20,11 @@ public class UserService {
 	public ResultDto<List<User>> getUserList(User user){
 		List<User> users = new ArrayList<User>();
 		User user1 = new User();
-		user1.setUserName("xiaohei");
+		user1.setUsername("xiaohei");
 		user1.setMobile("13229460282");
 		users.add(user1);
 		User user2 = new User();
-		user2.setUserName("xiaobai");
+		user2.setUsername("xiaobai");
 		user2.setMobile("15886098998");
 		users.add(user2);
 		if("1".equals("1")){

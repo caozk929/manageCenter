@@ -2,15 +2,19 @@ package com.zjht.manager.common.web;
 
 /**
  * web常量
- * 
- * @author liufang
- * 
+ * @outhor caozk
+ * @create 2017-09-05 19:44
  */
 public abstract class Constants {
 	/**
 	 * 路径分隔符
 	 */
 	public static final String SPT = "/";
+
+	/**
+	 * 路径分隔符
+	 */
+	public static final String SPT_LOG = "|";
 	/**
 	 * 点 .
 	 */
@@ -39,7 +43,10 @@ public abstract class Constants {
 	 * WEB-INF
 	 */
     public static final String WEB_INF = "WEB-INF";
+    //当前用户
     public static final String MEMBER = "member";
+	//当前用户具有的权限
+	public static final String PERMISSIONS = "permissions";
     /**
      * 前台登录用户session Key（预留）
      */
@@ -122,4 +129,36 @@ public abstract class Constants {
 	public static final String SESSION_PAY_VERIFYCODE = "session_pay_verifycode";
 	
 	public static final String REQUEST_LOGIN_URL_KEY = "_login_url";
+	/**
+	 * 业务编码
+	 */
+	public static final String BUSINESS_CODE = "bizCode";
+	/**
+	 * 错误码
+	 */
+	public static final String ERROR_CODE = "ERROR_CODE";
+	/**
+	 * 错误消息
+	 */
+	public static final String ERROR_MSG = "ERROR_MSG";
+
+	/**
+	 * 超级管理员
+	 */
+	public static final String ADMINISTRATOR = "超级管理员";
+
+	/**
+	 * 数值：0
+	 * 角色中使用status属性：0表示失效
+	 * 菜单中使用status属性：0表示停用
+	 */
+	public static final Integer ZERO = 0;
+
+	/**
+	 * 数值：1
+	 * 角色中使用status属性：1表示正常
+	 * 菜单中使用status属性：1表示在用
+	 */
+	public static final Integer ONE = 1;
+
 }

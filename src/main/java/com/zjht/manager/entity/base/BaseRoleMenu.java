@@ -1,62 +1,87 @@
 package com.zjht.manager.entity.base;
 
-import com.zjht.manager.entity.Role;
-import com.zjht.manager.entity.SysMenu;
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
- * RoleMenu entity. @author MyEclipse Persistence Tools
+ * Created by vip on 2017/9/4.
  */
+@Table(name = "t_role_menu")
+public class BaseRoleMenu implements Serializable {
 
-public class BaseRoleMenu implements java.io.Serializable {
+    /**
+     * 主键id
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator ="select lpad(nextval('SEQ_ROLE_MENU'),12,'0')")
+    private String id;
 
-	// Fields
+    /**
+     * 角色id
+     */
+    @Column(name = "role_id")
+    private String roleId;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6461468335728392712L;
-	private Long id;
-	private Role role;
-	private SysMenu menu;
+    /**
+     * 菜单id
+     */
+    @Column(name = "menu_id")
+    private String menuId;
 
-	public BaseRoleMenu() {
-	}
-	
-	public BaseRoleMenu(Long id){
-		this.id=id;
-	}
-	
-	public BaseRoleMenu(Long id, Role role, SysMenu menu) {
-		super();
-		this.id = id;
-		this.role = role;
-		this.menu = menu;
-	}
+    private static final long serialVersionUID = 1L;
 
-	// Property accessors
+    /**
+     * 获取主键id
+     *
+     * @return id - 主键id
+     */
+    public String getId() {
+        return id;
+    }
 
-	public Long getId() {
-		return this.id;
-	}
+    /**
+     * 设置主键id
+     *
+     * @param id 主键id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    /**
+     * 获取角色id
+     *
+     * @return role_id - 角色id
+     */
+    public String getRoleId() {
+        return roleId;
+    }
 
-	public Role getRole() {
-		return role;
-	}
+    /**
+     * 设置角色id
+     *
+     * @param roleId 角色id
+     */
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
 
-	public void setRole(Role role) {
-		this.role = role;
-	}
+    /**
+     * 获取菜单id
+     *
+     * @return menu_id - 菜单id
+     */
+    public String getMenuId() {
+        return menuId;
+    }
 
-	public SysMenu getMenu() {
-		return menu;
-	}
-
-	public void setMenu(SysMenu menu) {
-		this.menu = menu;
-	}
+    /**
+     * 设置菜单id
+     *
+     * @param menuId 菜单id
+     */
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
+    }
 
 }

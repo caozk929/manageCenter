@@ -1,130 +1,269 @@
 package com.zjht.manager.entity.base;
 
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.io.Serializable;
+import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zjht.manager.entity.UserRole;
+public class BaseUser implements Serializable {
 
-/**
- * User entity. @author MyEclipse Persistence Tools
- */
-
-public class BaseUser implements java.io.Serializable {
+    private static final long serialVersionUID = 3764508436244930981L;
+    /**
+     * 用户id
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY,generator ="select lpad(nextval('SEQ_USER'),12,'0')")
+    private String id;
 
     /**
+     * 昵称
+     */
+    @Column(name = "nick_name")
+    private String nickName;
+
+    /**
+     * 用户密码密文形式
+     */
+    private String password;
+
+    /**
+     * 用户手机号
+     */
+    private String mobile;
+
+    /**
+     * 用户姓名
+     */
+    private String username;
+
+    /**
+     * 用户类型1-后台管理用户
+     */
+    private Integer type;
+
+    /**
+     * 用户电子邮箱
+     */
+    private String email;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @Column(name = "update_time")
+    private Date updateTime;
+
+    /**
+     * 备注
+     */
+    private String remarks;
+
+    /**
+     * 渠道ID
+     */
+    @Column(name = "channel_id")
+    private String channelId;
+
+    /**
+     * 获取用户id
      *
+     * @return id - 用户id
      */
-    private static final long serialVersionUID = -2195555485509637879L;
-
-    private Long id;
-
-    private String code;                                     // 鐢ㄦ埛缂栧彿
-
-    private String nickName;                                    //昵称
-
-    private String userName;                                 // 用户名
-    @JsonIgnore
-    private String userPwd;                                  // 瀵嗙爜
-
-    private Integer status;                                   // 鐘舵��:0-澶辨晥; 1-姝ｅ父; 2-閿佸畾;3-寰呭鏍�
-
-    private String email;                                    // 閭
-
-    private String mobile;                                   // 鎵嬫満
-
-    private Integer userType;                                 // 鐢ㄦ埛绫诲瀷:0.鏅�氱敤鎴�1.绠＄悊鍛� 2.娌圭珯鐢ㄦ埛 3.浼佷笟鐢ㄦ埛
-
-    private Set<UserRole> userRoles;                                //鐢ㄦ埛瑙掕壊
-    // Constructors
-
-    /**
-     * default constructor
-     */
-    public BaseUser() {
-    }
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    /**
+     * 设置用户id
+     *
+     * @param id 用户id
+     */
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserPwd() {
-        return userPwd;
-    }
-
-    public void setUserPwd(String userPwd) {
-        this.userPwd = userPwd;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public Integer getUserType() {
-        return userType;
-    }
-
-    public void setUserType(Integer userType) {
-        this.userType = userType;
-    }
-
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
-    public Set<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(Set<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
-
-
+    /**
+     * 获取昵称
+     *
+     * @return nick_name - 昵称
+     */
     public String getNickName() {
         return nickName;
     }
 
+    /**
+     * 设置昵称
+     *
+     * @param nickName 昵称
+     */
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    /**
+     * 获取用户密码密文形式
+     *
+     * @return password - 用户密码密文形式
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * 设置用户密码密文形式
+     *
+     * @param password 用户密码密文形式
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * 获取用户手机号
+     *
+     * @return mobile - 用户手机号
+     */
+    public String getMobile() {
+        return mobile;
+    }
+
+    /**
+     * 设置用户手机号
+     *
+     * @param mobile 用户手机号
+     */
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    /**
+     * 获取用户姓名
+     *
+     * @return username - 用户姓名
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * 设置用户姓名
+     *
+     * @param username 用户姓名
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * 获取用户类型1-后台管理用户
+     *
+     * @return type - 用户类型1-后台管理用户
+     */
+    public Integer getType() {
+        return type;
+    }
+
+    /**
+     * 设置用户类型1-后台管理用户
+     *
+     * @param type 用户类型1-后台管理用户
+     */
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    /**
+     * 获取用户电子邮箱
+     *
+     * @return email - 用户电子邮箱
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * 设置用户电子邮箱
+     *
+     * @param email 用户电子邮箱
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取更新时间
+     *
+     * @return update_time - 更新时间
+     */
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    /**
+     * 设置更新时间
+     *
+     * @param updateTime 更新时间
+     */
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    /**
+     * 获取备注
+     *
+     * @return remarks - 备注
+     */
+    public String getRemarks() {
+        return remarks;
+    }
+
+    /**
+     * 设置备注
+     *
+     * @param remarks 备注
+     */
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    /**
+     * 获取渠道ID
+     * @return
+     */
+    public String getChannelId() {
+        return channelId;
+    }
+
+    /**
+     * 设置渠道ID
+     * @param channelId
+     */
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }
