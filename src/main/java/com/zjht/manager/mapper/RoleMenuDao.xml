@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.RoleMenuDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.RoleMenu">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="menu_id" jdbcType="VARCHAR" property="menuId" />
+  </resultMap>
+
+  <!-- 根据角色Id查询菜单Id-->
+  <select id="listMenuIdByRoleId" resultType="String">
+    SELECT DISTINCT menu_id FROM t_role_menu WHERE role_id = ${roleId }
+  </select>
+
+</mapper>

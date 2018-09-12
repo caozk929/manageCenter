@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.ApiChannelPayconfigDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.base.BaseApiChannelPayconfig">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="channel_id" jdbcType="VARCHAR" property="channelId" />
+    <result column="config_name" jdbcType="VARCHAR" property="configName" />
+    <result column="config_code" jdbcType="VARCHAR" property="configCode" />
+    <result column="config_remarks" jdbcType="VARCHAR" property="configRemarks" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="charset" jdbcType="VARCHAR" property="charset" />
+    <result column="currency" jdbcType="VARCHAR" property="currency" />
+    <result column="partner_code" jdbcType="VARCHAR" property="partnerCode" />
+    <result column="pay_account_name" jdbcType="VARCHAR" property="payAccountName" />
+    <result column="private_key_pwd" jdbcType="VARCHAR" property="privateKeyPwd" />
+    <result column="private_key_file_name" jdbcType="VARCHAR" property="privateKeyFileName" />
+    <result column="public_key_file_name" jdbcType="VARCHAR" property="publicKeyFileName" />
+    <result column="sign_type" jdbcType="VARCHAR" property="signType" />
+    <result column="pay_url" jdbcType="VARCHAR" property="payUrl" />
+    <result column="return_url" jdbcType="VARCHAR" property="returnUrl" />
+    <result column="notify_url" jdbcType="VARCHAR" property="notifyUrl" />
+    <result column="extend1" jdbcType="VARCHAR" property="extend1" />
+    <result column="extend2" jdbcType="VARCHAR" property="extend2" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+  </resultMap>
+</mapper>

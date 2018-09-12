@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.ChannelProductDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.channelProduct.ChannelProduct">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="channel_product_code" jdbcType="VARCHAR" property="channelProductCode" />
+    <result column="channel_code" jdbcType="VARCHAR" property="channelCode" />
+    <result column="product_code" jdbcType="VARCHAR" property="productCode" />
+    <result column="product_title" jdbcType="VARCHAR" property="productTitle" />
+    <result column="product_price" jdbcType="VARCHAR" property="productPrice" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="gmt_on_sell" jdbcType="TIMESTAMP" property="gmtOnSell" />
+    <result column="gmt_off_sell" jdbcType="TIMESTAMP" property="gmtOffSell" />    
+    <result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="series" jdbcType="VARCHAR" property="series" />  
+    <result column="specific_product_code" jdbcType="VARCHAR" property="specificProductCode" />  
+  </resultMap>
+</mapper>

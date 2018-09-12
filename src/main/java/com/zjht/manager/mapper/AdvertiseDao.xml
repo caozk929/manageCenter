@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.AdvertiseDao">
+    <resultMap id="BaseResultMap" type="com.zjht.manager.entity.Advertise">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="adv_id" jdbcType="VARCHAR" property="advId"/>
+        <result column="adv_position_id" jdbcType="VARCHAR" property="advPositionId"/>
+        <result column="adv_name" jdbcType="VARCHAR" property="advName"/>
+        <result column="adv_img" jdbcType="VARCHAR" property="advImg"/>
+        <result column="adv_link" jdbcType="VARCHAR" property="advLink"/>
+        <result column="adv_tip" jdbcType="VARCHAR" property="advTip"/>
+        <result column="adv_target" jdbcType="VARCHAR" property="advTarget"/>
+        <result column="adv_click" jdbcType="INTEGER" property="advClick"/>
+        <result column="adv_sort" jdbcType="INTEGER" property="advSort"/>
+        <result column="adv_status" jdbcType="INTEGER" property="advStatus"/>
+        <result column="adv_create_time" jdbcType="TIMESTAMP" property="advCreateTime"/>
+        <result column="adv_update_time" jdbcType="TIMESTAMP" property="advUpdateTime"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="channel" jdbcType="VARCHAR" property="channel"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+    </resultMap>
+
+    <update id="deleteByAdvId">
+        UPDATE t_advertise
+        SET adv_status = '2'
+        WHERE adv_id = #{advId}
+    </update>
+
+    <select id="findByAdvId" resultMap="BaseResultMap">
+        SELECT
+        adve.*, api.channel_name
+        FROM
+        t_advertise adve
+        LEFT JOIN (
+        SELECT
+        advp.position_code,api.channel_name
+        FROM
+        t_adv_position advp
+        JOIN t_api_channel api ON advp.channel = api.channel_code
+        ) api
+        ON adve.adv_position_id = api.position_code
+        where adve.adv_id=#{advId}
+    </select>
+
+    <select id="getAdvertiseList" resultMap="BaseResultMap">
+        SELECT
+        adve.*, api.channel_name,
+        api.channel
+        FROM
+        t_advertise adve
+        LEFT JOIN (
+        SELECT
+        advp.position_code,advp.channel,api.channel_name
+        FROM
+        t_adv_position advp
+        JOIN t_api_channel api ON advp.channel = api.channel_code and advp.status <![CDATA[!= ]]> '2'
+        ) api
+        ON adve.adv_position_id = api.position_code
+        where 1=1 and adve.adv_status <![CDATA[!= ]]> '2'
+
+        <if test="advertise.advName != null and advertise.advName !=''">
+            and adve.adv_name like CONCAT('%',CONCAT(#{advertise.advName},'%'))
+        </if>
+        <if test="advertise.beginDate != null and advertise.beginDate !=''">
+            and adve.adv_create_time >= #{advertise.beginDate}
+        </if>
+        <if test="advertise.endDate != null and advertise.endDate !=''">
+            <![CDATA[  and adve.adv_create_time <=  '${advertise.endDate} 23:59:59' ]]>
+        </if>
+        <if test="advertise.advPositionId != null and advertise.advPositionId !=''">
+            and adve.adv_position_id = #{advertise.advPositionId}
+        </if>
+        <if test="advertise.channel != null and advertise.channel !=''">
+            and api.channel = #{advertise.channel}
+        </if>
+        order by adve.adv_id
+        limit #{num},#{size}
+    </select>
+
+    <select id="getAdvertiseListCount" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        t_advertise adve
+        LEFT JOIN (
+        SELECT
+        advp.position_code,advp.channel,api.channel_name
+        FROM
+        t_adv_position advp
+        JOIN t_api_channel api ON advp.channel = api.channel_code and advp.status <![CDATA[!= ]]> '2'
+        ) api
+        ON adve.adv_position_id = api.position_code
+        where 1=1 and adve.adv_status <![CDATA[!= ]]> '2'
+
+        <if test="advertise.advName!= null and advertise.advName !=''">
+            and adve.adv_name like CONCAT('%',CONCAT(#{advertise.advName},'%'))
+        </if>
+        <if test="advertise.beginDate != null and advertise.beginDate !=''">
+            and adve.adv_create_time >= #{advertise.beginDate}
+        </if>
+        <if test="advertise.endDate != null and advertise.endDate !=''">
+            <![CDATA[  and adve.adv_create_time <=  '${advertise.endDate} 23:59:59' ]]>
+        </if>
+        <if test="advertise.advPositionId != null and advertise.advPositionId !=''">
+            and adve.adv_position_id = #{advertise.advPositionId}
+        </if>
+        <if test="advertise.channel != null and advertise.channel !=''">
+            and api.channel = #{advertise.channel}
+        </if>
+
+    </select>
+
+    <select id="getChannelName" resultType="string">
+        select api.channel_name
+        from t_api_channel api
+        join  t_adv_position advp
+        on api.channel_code = advp.channel
+        and advp.position_code= #{advPositionId}
+    </select>
+
+    <update id="updateAdvPositionId">
+        update  t_advertise adve set adve.adv_position_id=null where adve.adv_position_id =#{advPositionId}
+
+    </update>
+</mapper>

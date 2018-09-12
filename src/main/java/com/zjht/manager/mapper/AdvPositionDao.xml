@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.AdvPositionDao">
+    <resultMap id="BaseResultMap" type="com.zjht.manager.entity.AdvPosition">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="channel" jdbcType="VARCHAR" property="channel"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="position_code" jdbcType="VARCHAR" property="positionCode"/>
+        <result column="remarks" jdbcType="LONGVARCHAR" property="remarks"/>
+    </resultMap>
+
+    <update id="deleteById" >
+        update t_adv_position  set  status = '2' where id=#{id}
+    </update>
+
+</mapper>

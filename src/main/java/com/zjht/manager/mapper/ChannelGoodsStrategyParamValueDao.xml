@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.ChannelGoodsStrategyParamValueDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.channelProduct.ChannelGoodsStrategyParamValue">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="goods_strategy_id" jdbcType="CHAR" property="goodsStrategyId" />
+    <result column="strategy_id" jdbcType="CHAR" property="strategyId" />
+    <result column="strategy_param_id" jdbcType="CHAR" property="strategyParamId" />
+    <result column="strategy_param_value" jdbcType="VARCHAR" property="strategyParamValue" />
+    <result column="parameter_code" jdbcType="VARCHAR" property="parameterCode" />
+    <result column="parameter_name" jdbcType="VARCHAR" property="parameterName" />
+    <result column="parameter_type" jdbcType="TINYINT" property="parameterType" />    
+  </resultMap>
+</mapper>

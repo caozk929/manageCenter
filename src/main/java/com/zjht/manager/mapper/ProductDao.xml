@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.ProductDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.commodity.Product">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="product_code" jdbcType="VARCHAR" property="productCode" />
+    <result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="series" jdbcType="VARCHAR" property="series" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="product_count" jdbcType="BIGINT" property="productCount" />
+    <result column="synopsis_url" jdbcType="VARCHAR" property="synopsisUrl" />
+    <result column="product_type" jdbcType="TINYINT" property="productType" />
+  </resultMap>
+</mapper>

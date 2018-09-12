@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.LogDao">
+    <resultMap id="BaseResultMap" type="com.zjht.manager.entity.Log">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="business_code" jdbcType="VARCHAR" property="businessCode"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="subject_id" jdbcType="VARCHAR" property="subjectId"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="channel_name" jdbcType="VARCHAR" property="channelName"/>
+        <result column="service_name" jdbcType="VARCHAR" property="serviceName"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        select ${params.field} from t_log tl ${params.table}
+        where ${params.condition}
+        <if test="log.createTimeBegin != null and log.createTimeBegin !=''">
+            and tl.create_time >= #{log.createTimeBegin}
+        </if>
+        <if test="log.createTimeEnd != null and log.createTimeEnd !=''">
+            <![CDATA[  and tl.create_time <=  '${log.createTimeEnd} 23:59:59' ]]>
+        </if>
+        <if test="log.businessCode != null and log.businessCode !=''">
+            and tl.business_code like CONCAT('%',CONCAT(#{log.businessCode},'%'))
+        </if>
+        <if test="log.content != null and log.content !=''">
+            and tl.content like CONCAT('%',CONCAT(#{log.content},'%'))
+        </if>
+        <if test="log.type != null and log.type !=''">
+            and tl.type = #{log.type}
+        </if>
+        <choose>
+            <when test="log.type ==1">
+                <if test="log.username != null and log.username !=''">
+                    and tu.username like CONCAT('%',CONCAT(#{log.username},'%'))
+                </if>
+            </when>
+            <when test="log.type ==2">
+                <if test="log.channelName != null and log.channelName !=''">
+                    and ta.channel_name like CONCAT('%',CONCAT(#{log.channelName},'%'))
+                </if>
+                <if test="log.serviceName != null and log.serviceName !=''">
+                    and ts.service_name like CONCAT('%',CONCAT(#{log.serviceName},'%'))
+                </if>
+            </when>
+        </choose>
+
+         order by tl.id desc  limit  ${params.pagenum},${params.pagesize}
+    </select>
+
+
+    <select id="selectListCount" resultType="int">
+        select count(*) from t_log tl ${params.table}
+        where ${params.condition}
+        <if test="log.createTimeBegin != null and log.createTimeBegin !=''">
+            and tl.create_time >= #{log.createTimeBegin}
+        </if>
+        <if test="log.createTimeEnd != null and log.createTimeEnd !=''">
+            <![CDATA[  and tl.create_time <=  '${log.createTimeEnd} 23:59:59' ]]>
+        </if>
+        <if test="log.businessCode != null and log.businessCode !=''">
+            and tl.business_code like CONCAT('%',CONCAT(#{log.businessCode},'%'))
+        </if>
+        <if test="log.content != null and log.content !=''">
+            and tl.content like CONCAT('%',CONCAT(#{log.content},'%'))
+        </if>
+        <if test="log.type != null and log.type !=''">
+            and tl.type = #{log.type}
+        </if>
+        <choose>
+            <when test="log.type ==1">
+                <if test="log.username != null and log.username !=''">
+                    and tu.username like CONCAT('%',CONCAT(#{log.username},'%'))
+                </if>
+            </when>
+            <when test="log.type ==2">
+                <if test="log.channelName != null and log.channelName !=''">
+                    and ta.channel_name like CONCAT('%',CONCAT(#{log.channelName},'%'))
+                </if>
+                <if test="log.serviceName != null and log.serviceName !=''">
+                    and ts.service_name like CONCAT('%',CONCAT(#{log.serviceName},'%'))
+                </if>
+
+            </when>
+        </choose>
+    </select>
+
+</mapper>

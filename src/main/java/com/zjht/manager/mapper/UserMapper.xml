@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.UserDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.User">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="channel_id" jdbcType="VARCHAR" property="channelId" />
+  </resultMap>
+
+  <select id="getUserByUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT * from t_user where username = #{userName}
+  </select>
+
+  <select id="getPermissionsById" parameterType="java.lang.String" resultType="java.lang.String">
+    select DISTINCT m.code from t_role_menu rm,t_user_role ur,t_role r,t_menu m
+    where rm.menu_id=m.id and
+    rm.role_id=r.id and
+    ur.role_id=r.id and
+    ur.user_id = #{userId}
+  </select>
+
+  <select id="getUserByRoleId" resultMap="BaseResultMap">
+    SELECT  u.*
+    FROM t_user u
+    LEFT JOIN t_user_role ur ON u.id = ur.user_id
+    LEFT JOIN t_role r  ON ur.role_id = r.id
+    WHERE r.id = #{roleId}
+    ORDER BY  u.id
+
+  </select>
+</mapper>

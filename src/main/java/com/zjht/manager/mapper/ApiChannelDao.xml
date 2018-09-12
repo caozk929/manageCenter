@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.ApiChannelDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.ApiChannel">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="channel_code" jdbcType="VARCHAR" property="channelCode" />
+    <result column="channel_account" jdbcType="VARCHAR" property="channelAccount" />
+    <result column="channel_key" jdbcType="VARCHAR" property="channelKey" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <!-- 根据Id获取名称 -->
+  <select id="getNameById" resultType="java.lang.String">
+    SELECT t.channel_name FROM t_api_channel t WHERE t.id = ${id }
+  </select>
+
+  <!-- 获取未删除的渠道信息-->
+  <select id="getListIsNotDelete" resultMap="BaseResultMap">
+     select * from t_api_channel where status <![CDATA[!= ]]> #{status}
+  </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.manager.dao.CategoryDao">
+  <resultMap id="BaseResultMap" type="com.zjht.manager.entity.commodity.Category">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+    <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+    <result column="up_code" jdbcType="VARCHAR" property="upCode" />
+    <result column="category_type" jdbcType="TINYINT" property="categoryType" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="level" jdbcType="TINYINT" property="level" />    
+  </resultMap>
+</mapper>
