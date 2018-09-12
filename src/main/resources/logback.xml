@@ -2,19 +2,19 @@
 <configuration>
 	<substitutionProperty name="logbase" value="${catalina.base}/logs/" />
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+		<layout class="com.zjht.manager.common.log.logback.PatternLayoutExt">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%threadNum] %-5level %logger{60} - %msg%n</Pattern>
 		</layout>
 	</appender>
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<Encoding>UTF-8</Encoding>
-		<File>${logbase}mshop.log</File>
+		<File>${logbase}managecenter.log</File>
 		<maxFileSize>1MB</maxFileSize>
 		<append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<FileNamePattern>${logbase}mshop.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<FileNamePattern>${logbase}managecenter.%d{yyyy-MM-dd}.log</FileNamePattern>
 		</rollingPolicy>
-		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+		<layout class="com.zjht.manager.common.log.logback.PatternLayoutExt">
 			<pattern>%date [%threadNum] %-5level %logger{60} - %msg%n</pattern>
 		</layout>
 	</appender>
@@ -27,7 +27,7 @@
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>${logbase}exception.%d{yyyy-MM-dd}.log</FileNamePattern>
 		</rollingPolicy>
-		<layout class="com.zjht.manager.util.logback.PatternLayoutExt">
+		<layout class="com.zjht.manager.common.log.logback.PatternLayoutExt">
 			<pattern>%date [%threadNum] %-5level %logger{60} - %msg%n</pattern>
 		</layout>
 	</appender>
@@ -41,8 +41,9 @@
 	<logger name="org.springframework">
 		<level value="INFO" />
 	</logger>
+
 	<root>
-		<level value="ERROR" />
+		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>

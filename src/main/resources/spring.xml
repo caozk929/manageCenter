@@ -7,13 +7,22 @@ http://www.springframework.org/schema/context/spring-context-4.0.xsd"
 xmlns:p="http://www.springframework.org/schema/p">
 
 	<!-- 引入属性文件 -->
-	<context:property-placeholder location="" order="4" ignore-unresolvable="true"/>
+	<bean id="globalProp" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<array>
+				<value>classpath:config/fileServer.properties</value>
+			</array>
+		</property>
+	</bean>
+	<!-- 引入placeholder属性文件 -->
+	<context:property-placeholder location="classpath:config/fileServer.properties" order="4" ignore-unresolvable="true"/>
 
 	<import resource="spring-mybatis.xml"/>
 	<import resource="spring-mvc.xml"/>
 	<import resource="kafka-producer.xml"/>
 	<import resource="spring-jedis.xml"/>
 	<import resource="spring-shiro.xml"/>
+	<import resource="spring-rabbitmq.xml"/>
 	<!-- 自动扫描(自动注入) -->
 	<context:component-scan base-package="com.zjht.manager.dao,com.zjht.manager.service" />
 	<!-- 启用注解 -->

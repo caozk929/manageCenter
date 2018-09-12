@@ -56,6 +56,7 @@
         <constructor-arg name="clusterConfig" ref="redisClusterConfig" />
         <property name="timeout" value="${redis.timeout}" />
         <property name="poolConfig" ref="redisPoolConfig" />
+		<property name="password" value="#{'${redis.password}'!=''?'${redis.password}':null}" />
     </bean>
 	<!-- redis template definition p表示对该bean里面的属性进行注入，格式为p:属性名=注入的对象 效果与在bean里面使用<property>标签一样 -->
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
@@ -74,10 +75,18 @@
 			<bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
 		</property>
 	</bean>
+	<!--<bean id="redisMsgSender" class="com.zjht.manager.common.message.RedisMsgSender">-->
+		<!--<property name="redisTemplate" ref="stringRedisTemplate" />-->
+	<!--</bean>-->
 	<!-- 对string操作的封装 -->
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory" /> 
 	</bean>
+	<!-- 消息发送-->
+	<!--<bean id="msgTemplate" class="com.zjht.manager.common.message.MsgTemplate" >-->
+		<!--<property name="sender" ref="redisMsgSender"/>-->
+	<!--</bean>-->
+
 	<context:annotation-config />
 	<mvc:annotation-driven />
 </beans>

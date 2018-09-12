@@ -1,77 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd"
-	default-lazy-init="true">
-	
-	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<property name="cacheSeconds" value="0"/>
-		<property name="basenames">
-			<list>
-				<value>/WEB-INF/languages/admin/messages</value>
-				<value>/WEB-INF/languages/fckeditor/messages</value>
-			</list>
-		</property>
-	</bean>
-	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
-	
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-		<property name="webBindingInitializer">
-			<bean class="com.zjht.manager.common.web.springmvc.BindingInitializer"/>
-		</property>
-	</bean>
-	
-	<!-- 后台拦截器配置 -->
-	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<property name="interceptors">
-			<list>
-<!-- 				<ref bean="adminContextInterceptor"/> -->
-<!-- 				<ref bean="adminSecureInterceptor"/> -->
-			</list>
-		</property>
-	</bean>
-	<bean id="adminContextInterceptor" class="com.zjht.manager.common.web.interceptor.AdminContextInterceptor">
-		<property name="loginUrl" value="/admin/login.do"/>
-	</bean>
-	
-	<!-- 登陆拦截 -->
-	<bean id="adminSecureInterceptor" class="com.zjht.manager.common.web.interceptor.AdminSecureInterceptor"></bean>
-	
-	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
-		<property name="cookieName" value="clientlanguage"/>
-		<property name="cookieMaxAge" value="-1"/>
-	</bean>
-	
-	<bean id="freemarkerViewResolver" class="com.zjht.manager.common.web.springmvc.RichFreeMarkerViewResolver">
-		<property name="prefix" value="/pages/admin/"/>
-		<property name="suffix" value=".html"/>
-		<property name="contentType" value="text/html; charset=UTF-8"/>
-		<property name="exposeRequestAttributes" value="false"/>
-		<property name="exposeSessionAttributes" value="false"/>
-		<property name="exposeSpringMacroHelpers" value="true"/>
-	</bean>
-	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-		<property name="templateLoaderPath" value="/WEB-INF"/>
-		<!-- Freemarker标签配置 -->
-		<property name="freemarkerSettings">
-			<props>
-				<prop key="template_update_delay">-1</prop>
-				<prop key="defaultEncoding">UTF-8</prop>
-				<prop key="url_escaping_charset">UTF-8</prop>
-				<prop key="locale">zh_CN</prop>
-				<prop key="boolean_format">true,false</prop>
-				<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
-				<prop key="date_format">yyyy-MM-dd</prop>
-				<prop key="time_format">HH:mm:ss</prop>
-				<prop key="number_format">0.######</prop>
-				<prop key="whitespace_stripping">true</prop>
-				<!--<prop key="auto_import">/ftl/pony/index.ftl as p,/ftl/spring.ftl as s</prop>-->
-			</props>
-		</property>
-	</bean>
-	<!-- 一定要配置了组件扫描后，注解才会生效 -->
-	<context:component-scan base-package="com.zjht.manager.action.admin"></context:component-scan>
+
+    <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                    </bean>
+                </property>
+                <!-- 时区指定 -->
+                <property name="timeZone" value="GMT+8"/>
+                <!-- 为null字段时不显示 -->
+                <property name="serializationInclusion">
+                    <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                </property>
+            </bean>
+        </property>
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+                <value>text/plain;charset=utf-8</value>
+                <value>text/html;charset=utf-8</value>
+                <value>text/json;charset=utf-8</value>
+                <value>application/json;charset=utf-8</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 登陆拦截 -->
+    <bean id="adminSecureInterceptor" class="com.zjht.manager.common.web.interceptor.AdminSecureInterceptor"></bean>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="requestContextInterceptor"/>
+                <ref bean="adminSecureInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="jsonConverter"/><!-- json转换器 -->
+                <ref bean="stringConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <property name="cookieName" value="clientlanguage"/>
+        <property name="cookieMaxAge" value="-1"/>
+    </bean>
+
+    <bean id="freemarkerViewResolver" class="com.zjht.manager.common.web.springmvc.RichFreeMarkerViewResolver">
+        <property name="prefix" value="/pages/admin/"/>
+        <property name="suffix" value=".html"/>
+        <property name="contentType" value="text/html; charset=UTF-8"/>
+        <property name="exposeRequestAttributes" value="false"/>
+        <property name="exposeSessionAttributes" value="false"/>
+        <property name="exposeSpringMacroHelpers" value="true"/>
+    </bean>
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/WEB-INF"/>
+        <!-- Freemarker标签配置 -->
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="template_update_delay">-1</prop>
+                <prop key="defaultEncoding">UTF-8</prop>
+                <prop key="url_escaping_charset">UTF-8</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="boolean_format">true,false</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="time_format">HH:mm:ss</prop>
+                <prop key="number_format">0.######</prop>
+                <prop key="whitespace_stripping">true</prop>
+                <prop key="auto_import">/ftl/pony/index.ftl as p,/ftl/spring.ftl as s</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- 统一异常处理-->
+    <bean class="com.zjht.manager.exception.CommonExceptionHandler" />
+    <!-- 引入父容器的配置 -->
+    <context:property-placeholder properties-ref="globalProp" />
+    <!-- 一定要配置了组件扫描后，注解才会生效 -->
+    <context:component-scan base-package="com.zjht.manager.action.admin"/>
 </beans>
